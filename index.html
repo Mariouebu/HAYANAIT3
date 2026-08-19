@@ -2,2241 +2,1358 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Battle Royale 3D</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BATTLE ROYALE 3D</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  user-select:none;
-}
-
+*{box-sizing:border-box}
 html,body{
   margin:0;
   width:100%;
   height:100%;
   overflow:hidden;
-  font-family:Arial,"Noto Sans JP",sans-serif;
   background:#111;
+  font-family:Arial,"Noto Sans JP",sans-serif;
 }
-
-#game{
-  position:fixed;
-  inset:0;
-}
-
 canvas{
   display:block;
+  width:100%;
+  height:100%;
 }
-
-.hidden{
-  display:none!important;
-}
-
-/* =========================
-   ロビー
-========================= */
-
-#lobby{
-  position:fixed;
-  inset:0;
-  z-index:20;
-  color:white;
-  background:
-    linear-gradient(
-      rgba(5,15,30,.35),
-      rgba(5,15,30,.65)
-    );
-}
-
-.logo{
-  position:absolute;
-  left:30px;
-  top:22px;
-  font-size:38px;
-  font-weight:1000;
-  letter-spacing:2px;
-  text-shadow:0 4px 10px #000;
-}
-
-.topMenu{
-  position:absolute;
-  top:25px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:10px;
-}
-
-.menuBtn{
-  border:0;
-  color:white;
-  background:rgba(15,25,40,.82);
-  padding:14px 24px;
-  border-radius:12px;
-  font-size:17px;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 5px 18px #0007;
-}
-
-.menuBtn:hover{
-  background:#2563eb;
-  transform:translateY(-2px);
-}
-
-.profile{
-  position:absolute;
-  right:25px;
-  top:25px;
-  background:#101c2cdd;
-  padding:12px 18px;
-  border-radius:12px;
-}
-
-.playArea{
-  position:absolute;
-  left:55px;
-  bottom:55px;
-}
-
-.playBtn{
-  border:0;
-  padding:22px 75px;
-  border-radius:14px;
-  font-size:32px;
-  font-weight:1000;
-  color:white;
-  background:linear-gradient(135deg,#1683ff,#703cff);
-  cursor:pointer;
-  box-shadow:0 8px 25px #0009;
-}
-
-.playBtn:hover{
-  transform:scale(1.04);
-}
-
-.subtitle{
-  margin-top:12px;
-  font-size:14px;
-  opacity:.85;
-}
-
-/* =========================
-   HUD
-========================= */
-
 #hud{
   position:fixed;
   inset:0;
   pointer-events:none;
-  z-index:10;
   color:white;
 }
-
-.hpBox{
-  position:absolute;
-  top:20px;
-  left:20px;
-  width:360px;
-  padding:16px 20px;
+.panel{
+  background:rgba(5,20,35,.88);
   border-radius:16px;
-  background:#071727dd;
-  box-shadow:0 7px 25px #0008;
+  box-shadow:0 8px 30px rgba(0,0,0,.35);
 }
-
-.hpText{
-  font-size:21px;
+#hp{
+  position:absolute;
+  left:22px;
+  top:22px;
+  width:360px;
+  padding:18px 22px;
+  font-size:22px;
   font-weight:bold;
-  margin-bottom:8px;
 }
-
-.hpOuter{
-  height:25px;
-  border:2px solid white;
-  border-radius:20px;
-  overflow:hidden;
+.bar{
+  margin-top:10px;
+  width:100%;
+  height:26px;
   background:#111;
+  border:2px solid white;
+  border-radius:14px;
+  overflow:hidden;
 }
-
-#hpBar{
+#hpbar{
   height:100%;
   width:100%;
-  background:linear-gradient(90deg,#16d66b,#32e57a);
-  transition:.2s;
+  background:#28db72;
 }
-
-.status{
+#players{
   position:absolute;
-  top:20px;
+  right:22px;
+  top:22px;
+  padding:18px 25px;
+  font-size:22px;
+  font-weight:bold;
+}
+#storm{
+  position:absolute;
+  top:22px;
   left:50%;
   transform:translateX(-50%);
-  padding:14px 25px;
-  border-radius:14px;
-  background:#24125edc;
-  font-size:18px;
-  font-weight:bold;
-}
-
-.players{
-  position:absolute;
-  right:20px;
-  top:20px;
-  padding:16px 25px;
+  padding:16px 28px;
+  background:rgba(50,20,110,.9);
   border-radius:16px;
-  background:#071727dd;
-  font-size:20px;
+  font-size:21px;
   font-weight:bold;
 }
-
-.weapon{
-  position:absolute;
-  right:20px;
-  bottom:20px;
-  width:210px;
-  padding:18px;
-  text-align:center;
-  border-radius:16px;
-  background:#071727ee;
-}
-
-.weaponName{
-  font-size:25px;
-  font-weight:bold;
-}
-
-.ammo{
-  font-size:25px;
-  margin-top:5px;
-}
-
-.crosshair{
+#crosshair{
   position:absolute;
   left:50%;
   top:50%;
   transform:translate(-50%,-50%);
-  width:30px;
-  height:30px;
+  font-size:38px;
+  text-shadow:0 2px 5px #000;
 }
-
-.crosshair:before,
-.crosshair:after{
-  content:"";
+#weapon{
   position:absolute;
-  background:white;
-  box-shadow:0 1px 3px #000;
-}
-
-.crosshair:before{
-  width:30px;
-  height:2px;
-  top:14px;
-}
-
-.crosshair:after{
-  height:30px;
-  width:2px;
-  left:14px;
-}
-
-.controls{
-  position:absolute;
-  left:20px;
-  bottom:20px;
-  padding:15px;
-  border-radius:12px;
-  background:#071727dd;
-  line-height:1.7;
-  font-size:14px;
-}
-
-/* =========================
-   パネル
-========================= */
-
-.panel{
-  position:fixed;
-  z-index:50;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width:min(800px,90vw);
-  max-height:85vh;
-  overflow:auto;
-  padding:30px;
-  color:white;
-  border-radius:20px;
-  background:#071321f5;
-  box-shadow:0 20px 80px #000c;
-}
-
-.panel h1{
-  margin-top:0;
-}
-
-.close{
-  float:right;
-  border:0;
-  border-radius:10px;
-  background:#ef4444;
-  color:white;
-  padding:9px 15px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
-}
-
-.card{
-  background:#142238;
-  border-radius:14px;
+  right:22px;
+  bottom:22px;
+  width:245px;
   padding:20px;
   text-align:center;
 }
-
-.card button{
-  border:0;
-  padding:10px 18px;
-  border-radius:8px;
-  cursor:pointer;
+#weaponName{
+  font-size:28px;
   font-weight:bold;
 }
-
-.news{
-  background:#142238;
-  padding:18px;
+#ammo{
+  font-size:23px;
+  margin-top:7px;
+}
+#controls{
+  position:absolute;
+  left:22px;
+  bottom:22px;
+  padding:17px;
+  line-height:1.65;
+  font-size:15px;
+}
+#message{
+  position:absolute;
+  left:50%;
+  bottom:90px;
+  transform:translateX(-50%);
+  padding:12px 25px;
   border-radius:12px;
-  margin:10px 0;
+  background:rgba(0,0,0,.7);
+  opacity:0;
+  transition:.2s;
 }
-
-/* =========================
-   ログイン
-========================= */
-
-#loginPanel input{
-  width:100%;
-  padding:13px;
-  margin:8px 0;
-  border:0;
-  border-radius:8px;
-}
-
-.primary{
-  background:#2563eb;
+#menu{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.65);
   color:white;
+  z-index:10;
+}
+.menuBox{
+  width:min(600px,90vw);
+  padding:35px;
+  border-radius:25px;
+  background:rgba(10,25,40,.96);
+  text-align:center;
+}
+button{
   border:0;
-  padding:12px 20px;
-  border-radius:9px;
-  cursor:pointer;
+  border-radius:12px;
+  padding:14px 25px;
+  margin:7px;
+  font-size:18px;
   font-weight:bold;
+  cursor:pointer;
 }
-
-/* =========================
-   結果
-========================= */
-
-.resultTitle{
-  text-align:center;
-  font-size:50px;
-  font-weight:1000;
+button:hover{
+  transform:scale(1.04);
 }
-
-.resultRank{
+#lobby{
+  position:fixed;
+  inset:0;
+  display:none;
+  z-index:20;
+  color:white;
+  background:
+    radial-gradient(circle at 50% 30%,#3068a0,#101b2c 65%);
+}
+.lobbyTitle{
+  position:absolute;
+  top:35px;
+  left:45px;
+  font-size:42px;
+  font-weight:900;
+}
+.lobbyButtons{
+  position:absolute;
+  right:45px;
+  top:35px;
+}
+.lobbyCenter{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
   text-align:center;
-  font-size:80px;
-  color:#ffd43b;
+}
+.play{
+  font-size:35px;
+  padding:20px 70px;
+  background:#35d56c;
+  color:#07150c;
+}
+#toast{
+  position:fixed;
+  top:100px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:14px 25px;
+  color:white;
+  background:#111d;
+  border-radius:12px;
+  display:none;
+  z-index:30;
 }
 </style>
 </head>
 
 <body>
 
-<div id="game"></div>
+<canvas id="game"></canvas>
 
-<!-- =========================
-     ロビーUI
-========================= -->
+<div id="hud">
 
-<div id="lobby">
-
-  <div class="logo">
-    BATTLE ROYALE
-  </div>
-
-  <div class="topMenu">
-
-    <button class="menuBtn" onclick="showLobby()">
-      🏠 ロビー
-    </button>
-
-    <button class="menuBtn" onclick="openShop()">
-      🛒 ショップ
-    </button>
-
-    <button class="menuBtn" onclick="openLocker()">
-      🎒 ロッカー
-    </button>
-
-    <button class="menuBtn" onclick="openNews()">
-      📰 ニュース
-    </button>
-
-    <button class="menuBtn" onclick="openAdmin()">
-      ⚙️ 管理
-    </button>
-
-  </div>
-
-  <div class="profile">
-    👤 Mario
-    <button
-      onclick="logout()"
-      style="
-      margin-left:10px;
-      border:0;
-      padding:7px 10px;
-      background:#ef4444;
-      color:white;
-      border-radius:7px;">
-      ログアウト
-    </button>
-  </div>
-
-  <div class="playArea">
-
-    <button class="playBtn" onclick="startGame()">
-      ▶ PLAY
-    </button>
-
-    <div class="subtitle">
-      ソロ・バトルロイヤル
+  <div id="hp" class="panel">
+    ❤️ HP <span id="hpText">100 / 100</span>
+    <div class="bar">
+      <div id="hpbar"></div>
     </div>
-
   </div>
 
-</div>
-
-<!-- =========================
-     HUD
-========================= -->
-
-<div id="hud" class="hidden">
-
-  <div class="hpBox">
-
-    <div class="hpText">
-      ❤️ HP <span id="hpText">100</span> / 100
-    </div>
-
-    <div class="hpOuter">
-      <div id="hpBar"></div>
-    </div>
-
+  <div id="players" class="panel">
+    👥 残り <span id="playerCount">10</span>
   </div>
 
-  <div class="status">
+  <div id="storm">
     🌀 ストームまで <span id="stormTime">90</span>秒
   </div>
 
-  <div class="players">
-    👥 残り <span id="remaining">10</span>
-  </div>
+  <div id="crosshair">＋</div>
 
-  <div class="crosshair"></div>
-
-  <div class="weapon">
-
-    <div class="weaponName" id="weaponName">
-      🔫 RIFLE
-    </div>
-
-    <div class="ammo">
-      <span id="ammo">30</span> /
-      <span id="reserve">120</span>
-    </div>
-
-  </div>
-
-  <div class="controls">
-
+  <div id="controls" class="panel">
     <b>操作</b><br>
     WASD：移動<br>
     SHIFT：ダッシュ<br>
     SPACE：ジャンプ<br>
     左クリック：射撃<br>
     R：リロード<br>
-    1：ライフル<br>
-    2：ショットガン<br>
+    1：ライフル　2：ショットガン<br>
     B：建築<br>
     E：アイテム取得<br>
-    ESC：ロビー<br>
+    ESC：メニュー<br>
     🎮 右スティック：カメラ
-
   </div>
 
+  <div id="weapon" class="panel">
+    <div id="weaponName">🔫 RIFLE</div>
+    <div id="ammo">30 / 120</div>
+  </div>
+
+  <div id="message">メッセージ</div>
 </div>
 
-<!-- =========================
-     SHOP
-========================= -->
-
-<div id="shopPanel" class="panel hidden">
-
-  <button class="close" onclick="closePanels()">閉じる</button>
-
-  <h1>🛒 アイテムショップ</h1>
-
-  <div class="cards">
-
-    <div class="card">
-      <h2>🔫 GOLD RIFLE</h2>
-      <p>強力なライフル</p>
-      <button onclick="buy('GOLD RIFLE')">
-        800 🪙
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>⚔️ ENERGY</h2>
-      <p>エネルギー武器</p>
-      <button onclick="buy('ENERGY')">
-        1200 🪙
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>🕺 ダンス</h2>
-      <p>エモート</p>
-      <button onclick="buy('DANCE')">
-        500 🪙
-      </button>
-    </div>
-
+<div id="menu">
+  <div class="menuBox">
+    <h1>⚙️ メニュー</h1>
+    <button onclick="closeMenu()">ゲームへ戻る</button>
+    <button onclick="showLobby()">🏠 ロビー</button>
+    <button onclick="showLocker()">🎒 ロッカー</button>
+    <button onclick="showShop()">🛒 ショップ</button>
   </div>
-
 </div>
 
-<!-- =========================
-     LOCKER
-========================= -->
+<div id="lobby">
+  <div class="lobbyTitle">BATTLE ROYALE</div>
 
-<div id="lockerPanel" class="panel hidden">
-
-  <button class="close" onclick="closePanels()">閉じる</button>
-
-  <h1>🎒 ロッカー</h1>
-
-  <div class="cards">
-
-    <div class="card">
-      <h2>👕 BLUE HERO</h2>
-      <button onclick="selectSkin('BLUE HERO')">
-        装備
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>🟥 RED HERO</h2>
-      <button onclick="selectSkin('RED HERO')">
-        装備
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>🟩 GREEN HERO</h2>
-      <button onclick="selectSkin('GREEN HERO')">
-        装備
-      </button>
-    </div>
-
+  <div class="lobbyButtons">
+    <button onclick="startGame()">▶️ PLAY</button>
+    <button onclick="showShop()">🛒 ショップ</button>
+    <button onclick="showLocker()">🎒 ロッカー</button>
+    <button onclick="showNews()">📰 ニュース</button>
   </div>
 
+  <div class="lobbyCenter">
+    <h1>🏠 3Dロビー</h1>
+    <p id="lobbyPlayer">プレイヤー：Mario</p>
+    <button class="play" onclick="startGame()">PLAY</button>
+  </div>
 </div>
 
-<!-- =========================
-     NEWS
-========================= -->
-
-<div id="newsPanel" class="panel hidden">
-
-  <button class="close" onclick="closePanels()">閉じる</button>
-
-  <h1>📰 ニュース</h1>
-
-  <div class="news">
-    <h2>🌪️ シーズン1 開幕！</h2>
-    <p>
-      新しい島と武器が追加されました。
-    </p>
-  </div>
-
-  <div class="news">
-    <h2>🏗️ 建築アップデート</h2>
-    <p>
-      壁・床・階段を建築できます。
-    </p>
-  </div>
-
-</div>
-
-<!-- =========================
-     LOGIN
-========================= -->
-
-<div id="loginPanel" class="panel hidden">
-
-  <button class="close" onclick="closePanels()">閉じる</button>
-
-  <h1>🔐 管理者ログイン</h1>
-
-  <input
-    id="adminUser"
-    placeholder="ユーザー名">
-
-  <input
-    id="adminPass"
-    type="password"
-    placeholder="パスワード">
-
-  <button
-    class="primary"
-    onclick="adminLogin()">
-    ログイン
-  </button>
-
-  <p>
-    ※これはローカル版の簡易管理画面です。
-  </p>
-
-</div>
-
-<!-- =========================
-     ADMIN
-========================= -->
-
-<div id="adminPanel" class="panel hidden">
-
-  <button class="close" onclick="closePanels()">閉じる</button>
-
-  <h1>⚙️ 管理画面</h1>
-
-  <div class="cards">
-
-    <div class="card">
-      <h2>👥 プレイヤー管理</h2>
-      <p>プレイヤー数：1</p>
-      <button onclick="alert('プレイヤー一覧を表示')">
-        管理
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>📖 チャプター</h2>
-      <p>Chapter 1</p>
-      <button onclick="alert('チャプター設定')">
-        設定
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>🏆 シーズン</h2>
-      <p>Season 1</p>
-      <button onclick="alert('シーズン設定')">
-        設定
-      </button>
-    </div>
-
-    <div class="card">
-      <h2>🎬 ニュース投稿</h2>
-      <button onclick="postNews()">
-        投稿
-      </button>
-    </div>
-
-  </div>
-
-</div>
-
-<!-- =========================
-     RESULT
-========================= -->
-
-<div id="resultPanel" class="panel hidden">
-
-  <div class="resultTitle">
-    MATCH RESULT
-  </div>
-
-  <div class="resultRank">
-    #1
-  </div>
-
-  <p style="text-align:center;font-size:22px">
-    🏆 Victory Royale!
-  </p>
-
-  <div style="text-align:center;margin-top:30px">
-
-    <button
-      class="primary"
-      onclick="returnLobby()">
-      🏠 ロビーへ戻る
-    </button>
-
-  </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+<div id="toast"></div>
 
 <script>
+"use strict";
 
-/* =====================================================
+/* =========================================================
    基本
-===================================================== */
+========================================================= */
 
-let scene;
-let camera;
-let renderer;
-let clock;
+const canvas = document.getElementById("game");
+const gl = canvas.getContext("webgl", {
+  antialias:true,
+  alpha:false
+});
 
-let player;
-let playerBody;
-let playerHead;
-
-let running=false;
-
-let keys={};
-
-let yaw=0;
-let pitch=-0.25;
-
-let velocityY=0;
-let grounded=true;
-
-let hp=100;
-let ammo=30;
-let reserve=120;
-
-let weapon="RIFLE";
-
-let storm=90;
-let remaining=10;
-
-let buildings=[];
-let trees=[];
-let items=[];
-let bullets=[];
-
-const worldSize=180;
-
-
-/* =====================================================
-   THREE.JS 初期化
-===================================================== */
-
-function init3D(){
-
-  scene=new THREE.Scene();
-
-  scene.background=new THREE.Color(0x78c9f5);
-
-  scene.fog=new THREE.Fog(
-    0x78c9f5,
-    80,
-    300
-  );
-
-  camera=new THREE.PerspectiveCamera(
-    70,
-    innerWidth/innerHeight,
-    0.1,
-    500
-  );
-
-  renderer=new THREE.WebGLRenderer({
-    antialias:true
-  });
-
-  renderer.setSize(
-    innerWidth,
-    innerHeight
-  );
-
-  renderer.setPixelRatio(
-    Math.min(devicePixelRatio,2)
-  );
-
-  document
-    .getElementById("game")
-    .appendChild(renderer.domElement);
-
-  clock=new THREE.Clock();
-
-  /* 光 */
-
-  const hemi=new THREE.HemisphereLight(
-    0xbde8ff,
-    0x304020,
-    2.2
-  );
-
-  scene.add(hemi);
-
-  const sun=new THREE.DirectionalLight(
-    0xffffff,
-    2.5
-  );
-
-  sun.position.set(
-    80,
-    120,
-    50
-  );
-
-  sun.castShadow=true;
-
-  scene.add(sun);
-
-  createWorld();
-  createPlayer();
-
-  window.addEventListener(
-    "resize",
-    resize
-  );
-
-  animate();
+if(!gl){
+  alert("このブラウザではWebGLが利用できません。");
+  throw new Error("WebGL unavailable");
 }
 
+function resize(){
+  const dpr=Math.min(devicePixelRatio||1,2);
+  canvas.width=innerWidth*dpr;
+  canvas.height=innerHeight*dpr;
+  gl.viewport(0,0,canvas.width,canvas.height);
+}
+addEventListener("resize",resize);
+resize();
 
-/* =====================================================
-   地面
-===================================================== */
+/* =========================================================
+   シェーダー
+========================================================= */
+
+const vertexShaderSource=`
+attribute vec3 aPosition;
+attribute vec3 aNormal;
+
+uniform mat4 uMatrix;
+uniform mat4 uModel;
+
+varying vec3 vNormal;
+varying vec3 vWorld;
+
+void main(){
+  vec4 world=uModel*vec4(aPosition,1.0);
+  vWorld=world.xyz;
+  vNormal=mat3(uModel)*aNormal;
+  gl_Position=uMatrix*world;
+}
+`;
+
+const fragmentShaderSource=`
+precision mediump float;
+
+uniform vec4 uColor;
+uniform vec3 uLight;
+
+varying vec3 vNormal;
+varying vec3 vWorld;
+
+void main(){
+  vec3 n=normalize(vNormal);
+  float light=max(dot(n,normalize(uLight)),0.0);
+  float shade=.38+light*.72;
+
+  vec3 color=uColor.rgb*shade;
+
+  float fog=clamp(length(vWorld)/180.0,0.0,1.0);
+  color=mix(color,vec3(.45,.68,.82),fog*.18);
+
+  gl_FragColor=vec4(color,uColor.a);
+}
+`;
+
+function shader(type,source){
+  const s=gl.createShader(type);
+  gl.shaderSource(s,source);
+  gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){
+    console.error(gl.getShaderInfoLog(s));
+  }
+  return s;
+}
+
+const program=gl.createProgram();
+gl.attachShader(program,shader(gl.VERTEX_SHADER,vertexShaderSource));
+gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fragmentShaderSource));
+gl.linkProgram(program);
+
+gl.useProgram(program);
+
+const aPosition=gl.getAttribLocation(program,"aPosition");
+const aNormal=gl.getAttribLocation(program,"aNormal");
+const uMatrix=gl.getUniformLocation(program,"uMatrix");
+const uModel=gl.getUniformLocation(program,"uModel");
+const uColor=gl.getUniformLocation(program,"uColor");
+const uLight=gl.getUniformLocation(program,"uLight");
+
+/* =========================================================
+   行列
+========================================================= */
+
+function identity(){
+  return [
+    1,0,0,0,
+    0,1,0,0,
+    0,0,1,0,
+    0,0,0,1
+  ];
+}
+
+function multiply(a,b){
+  const r=new Array(16);
+
+  for(let c=0;c<4;c++){
+    for(let r0=0;r0<4;r0++){
+      r[c*4+r0]=
+        a[r0]*b[c*4]+
+        a[4+r0]*b[c*4+1]+
+        a[8+r0]*b[c*4+2]+
+        a[12+r0]*b[c*4+3];
+    }
+  }
+  return r;
+}
+
+function translate(x,y,z){
+  const m=identity();
+  m[12]=x;
+  m[13]=y;
+  m[14]=z;
+  return m;
+}
+
+function scale(x,y,z){
+  const m=identity();
+  m[0]=x;
+  m[5]=y;
+  m[10]=z;
+  return m;
+}
+
+function rotateY(a){
+  const c=Math.cos(a),s=Math.sin(a);
+  return [
+    c,0,-s,0,
+    0,1,0,0,
+    s,0,c,0,
+    0,0,0,1
+  ];
+}
+
+function rotateX(a){
+  const c=Math.cos(a),s=Math.sin(a);
+  return [
+    1,0,0,0,
+    0,c,s,0,
+    0,-s,c,0,
+    0,0,0,1
+  ];
+}
+
+function perspective(fov,aspect,near,far){
+  const f=1/Math.tan(fov/2);
+  const nf=1/(near-far);
+
+  return [
+    f/aspect,0,0,0,
+    0,f,0,0,
+    0,0,(far+near)*nf,-1,
+    0,0,(2*far*near)*nf,0
+  ];
+}
+
+function lookAt(eye,target,up=[0,1,0]){
+  let z=[
+    eye[0]-target[0],
+    eye[1]-target[1],
+    eye[2]-target[2]
+  ];
+
+  let len=Math.hypot(...z);
+  z=z.map(v=>v/len);
+
+  let x=[
+    up[1]*z[2]-up[2]*z[1],
+    up[2]*z[0]-up[0]*z[2],
+    up[0]*z[1]-up[1]*z[0]
+  ];
+
+  len=Math.hypot(...x);
+  x=x.map(v=>v/len);
+
+  let y=[
+    z[1]*x[2]-z[2]*x[1],
+    z[2]*x[0]-z[0]*x[2],
+    z[0]*x[1]-z[1]*x[0]
+  ];
+
+  return [
+    x[0],y[0],z[0],0,
+    x[1],y[1],z[1],0,
+    x[2],y[2],z[2],0,
+    -x[0]*eye[0]-x[1]*eye[1]-x[2]*eye[2],
+    -y[0]*eye[0]-y[1]*eye[1]-y[2]*eye[2],
+    -z[0]*eye[0]-z[1]*eye[1]-z[2]*eye[2],
+    1
+  ];
+}
+
+/* =========================================================
+   キューブ
+========================================================= */
+
+const cubeVertices=new Float32Array([
+  // front
+  -1,-1,1,  1,-1,1,  1,1,1,
+  -1,-1,1,  1,1,1, -1,1,1,
+
+  // back
+   1,-1,-1, -1,-1,-1, -1,1,-1,
+   1,-1,-1, -1,1,-1,  1,1,-1,
+
+  // left
+  -1,-1,-1, -1,-1,1, -1,1,1,
+  -1,-1,-1, -1,1,1, -1,1,-1,
+
+  // right
+   1,-1,1,  1,-1,-1,  1,1,-1,
+   1,-1,1,  1,1,-1,  1,1,1,
+
+  // top
+  -1,1,1,  1,1,1,  1,1,-1,
+  -1,1,1,  1,1,-1, -1,1,-1,
+
+  // bottom
+  -1,-1,-1, 1,-1,-1, 1,-1,1,
+  -1,-1,-1, 1,-1,1, -1,-1,1
+]);
+
+const cubeNormals=new Float32Array([
+  0,0,1,0,0,1,0,0,1,
+  0,0,1,0,0,1,
+
+  0,0,-1,0,0,-1,0,0,-1,
+  0,0,-1,0,0,-1,
+
+  -1,0,0,-1,0,0,-1,0,0,
+  -1,0,0,-1,0,0,
+
+  1,0,0,1,0,0,1,0,0,
+  1,0,0,1,0,0,
+
+  0,1,0,0,1,0,0,1,0,
+  0,1,0,0,1,0,
+
+  0,-1,0,0,-1,0,0,-1,0,
+  0,-1,0,0,-1,0
+]);
+
+const posBuffer=gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER,posBuffer);
+gl.bufferData(gl.ARRAY_BUFFER,cubeVertices,gl.STATIC_DRAW);
+
+const normalBuffer=gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER,normalBuffer);
+gl.bufferData(gl.ARRAY_BUFFER,cubeNormals,gl.STATIC_DRAW);
+
+function drawCube(model,color){
+  gl.bindBuffer(gl.ARRAY_BUFFER,posBuffer);
+  gl.enableVertexAttribArray(aPosition);
+  gl.vertexAttribPointer(aPosition,3,gl.FLOAT,false,0,0);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER,normalBuffer);
+  gl.enableVertexAttribArray(aNormal);
+  gl.vertexAttribPointer(aNormal,3,gl.FLOAT,false,0,0);
+
+  gl.uniformMatrix4fv(uModel,false,new Float32Array(model));
+  gl.uniform4fv(uColor,new Float32Array([...color,1]));
+
+  gl.drawArrays(gl.TRIANGLES,0,36);
+}
+
+function box(x,y,z,sx,sy,sz,color,rot=0){
+  let m=translate(x,y,z);
+  m=multiply(m,rotateY(rot));
+  m=multiply(m,scale(sx,sy,sz));
+  drawCube(m,color);
+}
+
+/* =========================================================
+   ゲーム
+========================================================= */
+
+const player={
+  x:0,
+  y:1,
+  z:10,
+  vy:0,
+  hp:100,
+  yaw:0,
+  pitch:-0.15,
+  speed:7,
+  sprint:1,
+  ammo:30,
+  reserve:120,
+  weapon:"RIFLE"
+};
+
+let playing=true;
+let building=false;
+let stormTimer=90;
+let remaining=10;
+let shotCooldown=0;
+let reloadTimer=0;
+
+const keys={};
+
+addEventListener("keydown",e=>{
+  keys[e.key.toLowerCase()]=true;
+
+  if(e.key==="Escape"){
+    document.getElementById("menu").style.display="flex";
+  }
+
+  if(e.key.toLowerCase()==="b"){
+    building=!building;
+    showMessage(building?"🧱 建築モード ON":"建築モード OFF");
+  }
+
+  if(e.key==="1"){
+    player.weapon="RIFLE";
+    document.getElementById("weaponName").textContent="🔫 RIFLE";
+  }
+
+  if(e.key==="2"){
+    player.weapon="SHOTGUN";
+    document.getElementById("weaponName").textContent="💥 SHOTGUN";
+  }
+
+  if(e.key.toLowerCase()==="r"){
+    reload();
+  }
+
+  if(e.code==="Space" && Math.abs(player.y-1)<.05){
+    player.vy=9;
+  }
+});
+
+addEventListener("keyup",e=>{
+  keys[e.key.toLowerCase()]=false;
+});
+
+addEventListener("mousedown",e=>{
+  if(e.button===0){
+    shoot();
+  }
+});
+
+/* =========================================================
+   コントローラー
+========================================================= */
+
+let gamepadIndex=null;
+
+addEventListener("gamepadconnected",e=>{
+  gamepadIndex=e.gamepad.index;
+  showMessage("🎮 Switchコントローラー接続");
+});
+
+function updateGamepad(dt){
+
+  const pads=navigator.getGamepads?navigator.getGamepads():[];
+
+  let gp=gamepadIndex!==null?pads[gamepadIndex]:pads[0];
+
+  if(!gp)return;
+
+  const lx=gp.axes[0]||0;
+  const ly=gp.axes[1]||0;
+  const rx=gp.axes[2]||0;
+  const ry=gp.axes[3]||0;
+
+  const dead=.15;
+
+  const moveX=Math.abs(lx)>dead?lx:0;
+  const moveZ=Math.abs(ly)>dead?ly:0;
+
+  const forward=[Math.sin(player.yaw),0,Math.cos(player.yaw)];
+  const right=[Math.cos(player.yaw),0,-Math.sin(player.yaw)];
+
+  player.x+=(right[0]*moveX+forward[0]*moveZ)*player.speed*dt;
+  player.z+=(right[2]*moveX+forward[2]*moveZ)*player.speed*dt;
+
+  if(Math.abs(rx)>dead){
+    player.yaw-=rx*2.8*dt;
+  }
+
+  if(Math.abs(ry)>dead){
+    player.pitch-=ry*1.7*dt;
+    player.pitch=Math.max(-1.0,Math.min(.6,player.pitch));
+  }
+
+  // A
+  if(gp.buttons[0]?.pressed && Math.abs(player.y-1)<.05){
+    player.vy=9;
+  }
+
+  // R2
+  if(gp.buttons[7]?.pressed){
+    shoot();
+  }
+
+  // X
+  if(gp.buttons[2]?.pressed){
+    reload();
+  }
+
+  // Y
+  if(gp.buttons[3]?.pressed){
+    building=true;
+  }
+}
+
+/* =========================================================
+   カメラ
+========================================================= */
+
+function camera(){
+
+  const distance=7;
+
+  const horizontal=Math.cos(player.pitch)*distance;
+
+  const cx=
+    player.x-
+    Math.sin(player.yaw)*horizontal;
+
+  const cz=
+    player.z-
+    Math.cos(player.yaw)*horizontal;
+
+  const cy=
+    player.y+
+    2.4-
+    Math.sin(player.pitch)*distance;
+
+  return {
+    eye:[cx,cy,cz],
+    target:[
+      player.x,
+      player.y+1.4,
+      player.z
+    ]
+  };
+}
+
+/* =========================================================
+   マップ
+========================================================= */
+
+const trees=[];
+const buildings=[];
+const pickups=[];
+const enemies=[];
+const structures=[];
 
 function createWorld(){
 
-  const groundGeo=
-    new THREE.PlaneGeometry(
-      worldSize,
-      worldSize,
-      30,
-      30
-    );
-
-  const groundMat=
-    new THREE.MeshStandardMaterial({
-      color:0x4fa447,
-      roughness:1
-    });
-
-  const ground=
-    new THREE.Mesh(
-      groundGeo,
-      groundMat
-    );
-
-  ground.rotation.x=-Math.PI/2;
-
-  scene.add(ground);
-
-  /* 道路 */
-
-  createRoad(
-    0,
-    0,
-    worldSize,
-    10
+  // 建物
+  buildings.push(
+    [-28,2,-20,8,4,8],
+    [30,2,-25,9,4,7],
+    [-30,2,30,7,4,9],
+    [30,2,28,8,4,8],
+    [0,2,-45,10,4,7]
   );
 
-  createRoad(
-    0,
-    0,
-    10,
-    worldSize
-  );
+  // 木
+  for(let i=0;i<70;i++){
 
-  /* 建物 */
+    const x=(Math.random()-.5)*150;
+    const z=(Math.random()-.5)*150;
 
-  for(let i=0;i<18;i++){
+    if(Math.hypot(x,z)<13)continue;
 
-    const x=
-      (Math.random()-.5)*150;
-
-    const z=
-      (Math.random()-.5)*150;
-
-    if(Math.abs(x)<18 &&
-       Math.abs(z)<18){
-      continue;
-    }
-
-    createBuilding(
+    trees.push({
       x,
-      z
-    );
-  }
-
-  /* 木 */
-
-  for(let i=0;i<75;i++){
-
-    const x=
-      (Math.random()-.5)*170;
-
-    const z=
-      (Math.random()-.5)*170;
-
-    if(Math.abs(x)<20 &&
-       Math.abs(z)<20){
-      continue;
-    }
-
-    createTree(x,z);
-  }
-
-  /* 岩 */
-
-  for(let i=0;i<35;i++){
-
-    const x=
-      (Math.random()-.5)*170;
-
-    const z=
-      (Math.random()-.5)*170;
-
-    createRock(x,z);
-  }
-
-  /* アイテム */
-
-  createItem(
-    12,
-    0.8,
-    -8,
-    "🔫 RIFLE"
-  );
-
-  createItem(
-    -10,
-    0.8,
-    7,
-    "💚 MEDKIT"
-  );
-
-}
-
-
-/* =====================================================
-   道路
-===================================================== */
-
-function createRoad(
-  x,
-  z,
-  width,
-  depth
-){
-
-  const geo=
-    new THREE.BoxGeometry(
-      width,
-      .08,
-      depth
-    );
-
-  const mat=
-    new THREE.MeshStandardMaterial({
-      color:0x30343a,
-      roughness:.9
+      z,
+      s:.8+Math.random()*.9
     });
-
-  const road=
-    new THREE.Mesh(
-      geo,
-      mat
-    );
-
-  road.position.set(
-    x,
-    .02,
-    z
-  );
-
-  scene.add(road);
-
-}
-
-
-/* =====================================================
-   建物
-===================================================== */
-
-function createBuilding(x,z){
-
-  const group=
-    new THREE.Group();
-
-  const w=10+
-    Math.random()*8;
-
-  const d=8+
-    Math.random()*8;
-
-  const h=5+
-    Math.random()*3;
-
-  const body=
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        w,
-        h,
-        d
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color:
-          new THREE.Color()
-            .setHSL(
-              Math.random()*.08+.05,
-              .45,
-              .35
-            )
-      })
-
-    );
-
-  body.position.y=h/2;
-
-  group.add(body);
-
-  /* 屋根 */
-
-  const roof=
-    new THREE.Mesh(
-
-      new THREE.ConeGeometry(
-        Math.max(w,d)*.75,
-        3.5,
-        4
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color:0x51382c
-      })
-
-    );
-
-  roof.position.y=h+1.7;
-
-  roof.rotation.y=Math.PI/4;
-
-  group.add(roof);
-
-  group.position.set(x,0,z);
-
-  scene.add(group);
-
-  buildings.push(group);
-}
-
-
-/* =====================================================
-   木
-===================================================== */
-
-function createTree(x,z){
-
-  const group=
-    new THREE.Group();
-
-  const trunk=
-    new THREE.Mesh(
-
-      new THREE.CylinderGeometry(
-        .6,
-        .8,
-        4,
-        8
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color:0x6b4328
-      })
-
-    );
-
-  trunk.position.y=2;
-
-  group.add(trunk);
-
-  for(let i=0;i<3;i++){
-
-    const leaves=
-      new THREE.Mesh(
-
-        new THREE.ConeGeometry(
-          3.5-i*.45,
-          5,
-          8
-        ),
-
-        new THREE.MeshStandardMaterial({
-          color:0x126b2d
-        })
-
-      );
-
-    leaves.position.y=
-      4+i*2.4;
-
-    group.add(leaves);
-
   }
 
-  group.position.set(x,0,z);
+  // アイテム
+  for(let i=0;i<18;i++){
+    pickups.push({
+      x:(Math.random()-.5)*110,
+      y:.6,
+      z:(Math.random()-.5)*110,
+      type:i%3===0?"shield":"ammo",
+      taken:false
+    });
+  }
 
-  scene.add(group);
-
-  trees.push(group);
+  // 敵
+  for(let i=0;i<9;i++){
+    enemies.push({
+      x:(Math.random()-.5)*100,
+      y:1,
+      z:(Math.random()-.5)*100,
+      hp:100,
+      alive:true,
+      timer:Math.random()*5
+    });
+  }
 }
 
+createWorld();
 
-/* =====================================================
-   岩
-===================================================== */
+/* =========================================================
+   描画
+========================================================= */
 
-function createRock(x,z){
+function render(){
 
-  const rock=
-    new THREE.Mesh(
+  gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(.38,.68,.87,1);
+  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 
-      new THREE.DodecahedronGeometry(
-        .8+Math.random()*1.5
-      ),
+  const cam=camera();
 
-      new THREE.MeshStandardMaterial({
-        color:0x777777,
-        roughness:1
-      })
+  const view=lookAt(cam.eye,cam.target);
+  const proj=perspective(
+    Math.PI/3,
+    canvas.width/canvas.height,
+    .1,
+    300
+  );
 
+  const vp=multiply(proj,view);
+
+  gl.uniformMatrix4fv(
+    uMatrix,
+    false,
+    new Float32Array(vp)
+  );
+
+  gl.uniform3fv(
+    uLight,
+    new Float32Array([-.5,1,.3])
+  );
+
+  // 地面
+  box(0,-1,0,75,1,75,[.18,.48,.17]);
+
+  // 道路
+  box(0,.02,0,4,.04,75,[.16,.18,.20]);
+  box(0,.03,0,75,.04,4,[.16,.18,.20]);
+
+  // 建物
+  for(const b of buildings){
+    box(
+      b[0],
+      b[1],
+      b[2],
+      b[3],
+      b[4],
+      b[5],
+      [.42,.25,.14]
     );
 
-  rock.position.set(
-    x,
-    .8,
-    z
+    // 屋根
+    box(
+      b[0],
+      b[1]+b[4]+.8,
+      b[2],
+      b[3]+.6,
+      .7,
+      b[5]+.6,
+      [.25,.12,.08]
+    );
+
+    // ドア
+    box(
+      b[0],
+      b[1],
+      b[2]+b[5]+.06,
+      1.1,
+      2,
+      .1,
+      [.08,.08,.08]
+    );
+  }
+
+  // 木
+  for(const t of trees){
+
+    box(
+      t.x,
+      2*t.s,
+      t.z,
+      .55*t.s,
+      2*t.s,
+      .55*t.s,
+      [.35,.18,.07]
+    );
+
+    box(
+      t.x,
+      5*t.s,
+      t.z,
+      2.3*t.s,
+      3*t.s,
+      2.3*t.s,
+      [.04,.30,.10]
+    );
+  }
+
+  // アイテム
+  for(const p of pickups){
+    if(p.taken)continue;
+
+    const color=p.type==="ammo"
+      ?[1,.75,.05]
+      :[.1,.45,1];
+
+    box(
+      p.x,
+      p.y,
+      p.z,
+      .45,
+      .45,
+      .45,
+      color,
+      performance.now()/700
+    );
+  }
+
+  // 建築物
+  for(const s of structures){
+    box(
+      s.x,
+      s.y,
+      s.z,
+      2.2,
+      2.2,
+      .25,
+      [.55,.35,.18],
+      s.rot
+    );
+  }
+
+  // 敵
+  for(const e of enemies){
+
+    if(!e.alive)continue;
+
+    // 胴体
+    box(
+      e.x,
+      1.5,
+      e.z,
+      .75,
+      1.4,
+      .5,
+      [.75,.15,.12]
+    );
+
+    // 頭
+    box(
+      e.x,
+      3.2,
+      e.z,
+      .65,
+      .65,
+      .65,
+      [.9,.55,.35]
+    );
+  }
+
+  // プレイヤー
+  box(
+    player.x,
+    player.y+1.2,
+    player.z,
+    .7,
+    1.2,
+    .5,
+    [.05,.25,.85],
+    player.yaw
   );
 
-  rock.rotation.set(
-    Math.random(),
-    Math.random(),
-    Math.random()
+  box(
+    player.x,
+    player.y+2.8,
+    player.z,
+    .62,
+    .62,
+    .62,
+    [1,.65,.4]
   );
 
-  scene.add(rock);
+  // 銃
+  box(
+    player.x+
+      Math.sin(player.yaw)*1.1,
+    player.y+1.5,
+    player.z+
+      Math.cos(player.yaw)*1.1,
+    .9,
+    .15,
+    .15,
+    [.05,.05,.05],
+    player.yaw
+  );
 }
 
+/* =========================================================
+   ゲーム処理
+========================================================= */
 
-/* =====================================================
-   プレイヤー
-===================================================== */
+function update(dt){
 
-function createPlayer(){
+  updateGamepad(dt);
 
-  player=
-    new THREE.Group();
+  if(!playing)return;
 
-  /* 胴体 */
+  let dx=0,dz=0;
 
-  playerBody=
-    new THREE.Mesh(
+  if(keys["w"])dz-=1;
+  if(keys["s"])dz+=1;
+  if(keys["a"])dx-=1;
+  if(keys["d"])dx+=1;
 
-      new THREE.CapsuleGeometry(
-        .65,
-        1.4,
-        8,
-        16
-      ),
+  const length=Math.hypot(dx,dz);
 
-      new THREE.MeshStandardMaterial({
-        color:0x2563eb
-      })
-
-    );
-
-  playerBody.position.y=1.5;
-
-  player.add(playerBody);
-
-  /* 頭 */
-
-  playerHead=
-    new THREE.Mesh(
-
-      new THREE.SphereGeometry(
-        .65,
-        20,
-        20
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color:0xffc08a
-      })
-
-    );
-
-  playerHead.position.y=2.9;
-
-  player.add(playerHead);
-
-  /* 武器 */
-
-  const gun=
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        .25,
-        .25,
-        1.7
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color:0x202020
-      })
-
-    );
-
-  gun.position.set(
-    .75,
-    1.8,
-    -.65
-  );
-
-  gun.rotation.y=
-    Math.PI/2;
-
-  player.add(gun);
-
-  player.position.set(
-    0,
-    0,
-    12
-  );
-
-  scene.add(player);
-
-}
-
-
-/* =====================================================
-   アイテム
-===================================================== */
-
-function createItem(
-  x,
-  y,
-  z,
-  name
-){
-
-  const item=
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        .8,
-        .8,
-        .8
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color:
-          name.includes("MED")
-          ?0x22c55e
-          :0xfacc15,
-        emissive:
-          name.includes("MED")
-          ?0x073b16
-          :0x3d3000
-      })
-
-    );
-
-  item.position.set(
-    x,y,z
-  );
-
-  item.userData.name=name;
-
-  scene.add(item);
-
-  items.push(item);
-
-}
-
-
-/* =====================================================
-   キー入力
-===================================================== */
-
-addEventListener(
-  "keydown",
-  e=>{
-
-    keys[e.code]=true;
-
-    if(e.code==="Space"){
-      jump();
-    }
-
-    if(e.code==="ShiftLeft"||
-       e.code==="ShiftRight"){
-      keys.shift=true;
-    }
-
-    if(e.code==="KeyB"){
-      build();
-    }
-
-    if(e.code==="KeyE"){
-      pickup();
-    }
-
-    if(e.code==="Digit1"){
-      weapon="RIFLE";
-      updateWeapon();
-    }
-
-    if(e.code==="Digit2"){
-      weapon="SHOTGUN";
-      updateWeapon();
-    }
-
-    if(e.code==="KeyR"){
-      reload();
-    }
-
-    if(e.code==="Escape"){
-      returnLobby();
-    }
-
+  if(length){
+    dx/=length;
+    dz/=length;
   }
-);
-
-addEventListener(
-  "keyup",
-  e=>{
-    keys[e.code]=false;
-
-    if(e.code==="ShiftLeft"||
-       e.code==="ShiftRight"){
-      keys.shift=false;
-    }
-  }
-);
-
-
-/* =====================================================
-   マウスカメラ
-===================================================== */
-
-let mouseDown=false;
-
-addEventListener(
-  "mousedown",
-  e=>{
-
-    if(!running)return;
-
-    mouseDown=true;
-
-    if(e.button===0){
-      shoot();
-    }
-
-  }
-);
-
-addEventListener(
-  "mouseup",
-  ()=>{
-    mouseDown=false;
-  }
-);
-
-addEventListener(
-  "mousemove",
-  e=>{
-
-    if(!running)return;
-
-    if(
-      document.pointerLockElement ===
-      renderer.domElement
-    ){
-
-      yaw -= e.movementX*.0025;
-
-      pitch -= e.movementY*.0025;
-
-      pitch=
-        Math.max(
-          -.9,
-          Math.min(.5,pitch)
-        );
-
-    }
-
-  }
-);
-
-rendererReady();
-
-function rendererReady(){
-
-  document.addEventListener(
-    "click",
-    ()=>{
-      if(running){
-        renderer.domElement.requestPointerLock();
-      }
-    }
-  );
-
-}
-
-
-/* =====================================================
-   移動
-===================================================== */
-
-function updatePlayer(dt){
-
-  if(!running)return;
 
   const speed=
-    keys.shift ? 12 : 6;
+    player.speed*
+    (keys["shift"]?1.8:1);
 
-  const forward=
-    new THREE.Vector3(
-      -Math.sin(yaw),
-      0,
-      -Math.cos(yaw)
-    );
+  const sin=Math.sin(player.yaw);
+  const cos=Math.cos(player.yaw);
 
-  const right=
-    new THREE.Vector3(
-      Math.cos(yaw),
-      0,
-      -Math.sin(yaw)
-    );
+  player.x+=(dx*cos+dz*sin)*speed*dt;
+  player.z+=(-dx*sin+dz*cos)*speed*dt;
 
-  const move=
-    new THREE.Vector3();
+  // ジャンプ
+  player.vy-=22*dt;
+  player.y+=player.vy*dt;
 
-  if(keys.KeyW)
-    move.add(forward);
-
-  if(keys.KeyS)
-    move.sub(forward);
-
-  if(keys.KeyD)
-    move.add(right);
-
-  if(keys.KeyA)
-    move.sub(right);
-
-  if(move.length()>0){
-
-    move.normalize();
-
-    player.position.addScaledVector(
-      move,
-      speed*dt
-    );
-
-    player.rotation.y=
-      Math.atan2(
-        move.x,
-        move.z
-      );
-
+  if(player.y<1){
+    player.y=1;
+    player.vy=0;
   }
 
-  /* 重力 */
+  // マップ外制限
+  player.x=Math.max(-70,Math.min(70,player.x));
+  player.z=Math.max(-70,Math.min(70,player.z));
 
-  velocityY-=25*dt;
+  // ストーム
+  stormTimer-=dt;
 
-  player.position.y+=
-    velocityY*dt;
+  if(stormTimer<=0){
+    stormTimer=0;
 
-  if(player.position.y<=0){
+    const dist=Math.hypot(player.x,player.z);
 
-    player.position.y=0;
-
-    velocityY=0;
-
-    grounded=true;
-
+    if(dist>55){
+      player.hp-=4*dt;
+    }
   }
 
-  /* マップ外 */
+  // 敵AI
+  for(const e of enemies){
 
-  const limit=85;
+    if(!e.alive)continue;
 
-  player.position.x=
-    Math.max(
-      -limit,
-      Math.min(
-        limit,
-        player.position.x
-      )
-    );
+    const dx=player.x-e.x;
+    const dz=player.z-e.z;
+    const dist=Math.hypot(dx,dz);
 
-  player.position.z=
-    Math.max(
-      -limit,
-      Math.min(
-        limit,
-        player.position.z
-      )
-    );
+    if(dist<35){
 
-}
+      e.x+=(dx/dist)*1.8*dt;
+      e.z+=(dz/dist)*1.8*dt;
 
+      e.timer-=dt;
 
-/* =====================================================
-   ジャンプ
-===================================================== */
-
-function jump(){
-
-  if(
-    running &&
-    grounded
-  ){
-
-    velocityY=10;
-
-    grounded=false;
-
+      if(e.timer<=0 && dist<20){
+        player.hp-=5;
+        e.timer=2.5;
+      }
+    }
   }
 
+  // 射撃クールダウン
+  if(shotCooldown>0)shotCooldown-=dt;
+
+  if(reloadTimer>0){
+    reloadTimer-=dt;
+
+    if(reloadTimer<=0){
+      const need=30-player.ammo;
+      const amount=Math.min(need,player.reserve);
+
+      player.ammo+=amount;
+      player.reserve-=amount;
+    }
+  }
+
+  updateHUD();
 }
 
-
-/* =====================================================
-   カメラ
-===================================================== */
-
-function updateCamera(){
-
-  if(!player)return;
-
-  const distance=8;
-
-  const height=3;
-
-  const offset=
-    new THREE.Vector3(
-      Math.sin(yaw)*distance,
-      height+
-        Math.sin(pitch)*4,
-      Math.cos(yaw)*distance
-    );
-
-  const target=
-    player.position.clone();
-
-  target.y+=2;
-
-  const desired=
-    target.clone().add(offset);
-
-  camera.position.lerp(
-    desired,
-    .12
-  );
-
-  camera.lookAt(target);
-
-}
-
-
-/* =====================================================
+/* =========================================================
    射撃
-===================================================== */
+========================================================= */
 
 function shoot(){
 
-  if(!running)return;
+  if(!playing)return;
+  if(reloadTimer>0)return;
+  if(shotCooldown>0)return;
 
-  if(ammo<=0){
-
+  if(player.ammo<=0){
     reload();
-
     return;
-
   }
 
-  ammo--;
+  player.ammo--;
 
-  updateAmmo();
+  shotCooldown=
+    player.weapon==="RIFLE"?.12:.55;
 
-  const dir=
-    new THREE.Vector3();
+  let best=null;
+  let bestDist=999;
 
-  camera.getWorldDirection(dir);
+  for(const e of enemies){
 
-  const bullet=
-    new THREE.Mesh(
+    if(!e.alive)continue;
 
-      new THREE.SphereGeometry(
-        .09,
-        8,
-        8
-      ),
+    const dx=e.x-player.x;
+    const dz=e.z-player.z;
 
-      new THREE.MeshBasicMaterial({
-        color:0xffdf4d
-      })
+    const dist=Math.hypot(dx,dz);
 
+    if(dist>45)continue;
+
+    let angle=Math.atan2(dx,dz);
+    let diff=Math.atan2(
+      Math.sin(angle-player.yaw),
+      Math.cos(angle-player.yaw)
     );
 
-  bullet.position.copy(
-    camera.position
-  );
-
-  bullet.userData.velocity=
-    dir.multiplyScalar(60);
-
-  bullet.userData.life=2;
-
-  scene.add(bullet);
-
-  bullets.push(bullet);
-
-}
-
-
-/* =====================================================
-   弾
-===================================================== */
-
-function updateBullets(dt){
-
-  for(
-    let i=bullets.length-1;
-    i>=0;
-    i--
-  ){
-
-    const b=bullets[i];
-
-    b.position.addScaledVector(
-      b.userData.velocity,
-      dt
-    );
-
-    b.userData.life-=dt;
-
-    if(b.userData.life<=0){
-
-      scene.remove(b);
-
-      bullets.splice(i,1);
-
+    if(Math.abs(diff)<.12 && dist<bestDist){
+      best=e;
+      bestDist=dist;
     }
-
   }
 
+  if(best){
+
+    const damage=
+      player.weapon==="RIFLE"?25:55;
+
+    best.hp-=damage;
+
+    if(best.hp<=0){
+      best.alive=false;
+      remaining=Math.max(1,remaining-1);
+      showMessage("💥 敵を撃破！");
+    }
+  }
+
+  updateHUD();
 }
-
-
-/* =====================================================
-   リロード
-===================================================== */
 
 function reload(){
 
-  const need=30-ammo;
+  if(player.ammo>=30)return;
+  if(player.reserve<=0)return;
+  if(reloadTimer>0)return;
 
-  const amount=
-    Math.min(
-      need,
-      reserve
-    );
-
-  ammo+=amount;
-
-  reserve-=amount;
-
-  updateAmmo();
-
+  reloadTimer=1.5;
+  showMessage("🔄 リロード中...");
 }
 
+/* =========================================================
+   アイテム・建築
+========================================================= */
 
-/* =====================================================
-   武器
-===================================================== */
+addEventListener("keydown",e=>{
 
-function updateWeapon(){
+  if(e.key.toLowerCase()==="e"){
 
-  const el=
-    document.getElementById(
-      "weaponName"
-    );
+    for(const p of pickups){
 
-  el.textContent=
-    weapon==="RIFLE"
-    ?"🔫 RIFLE"
-    :"💥 SHOTGUN";
+      if(p.taken)continue;
 
-}
+      const d=Math.hypot(
+        player.x-p.x,
+        player.z-p.z
+      );
 
+      if(d<3){
 
-/* =====================================================
-   建築
-===================================================== */
+        p.taken=true;
 
-function build(){
+        if(p.type==="ammo"){
+          player.reserve+=30;
+          showMessage("📦 弾薬 +30");
+        }else{
+          player.hp=Math.min(100,player.hp+25);
+          showMessage("🛡️ シールド回復！");
+        }
 
-  if(!running)return;
-
-  const geo=
-    new THREE.BoxGeometry(
-      5,
-      4,
-      .35
-    );
-
-  const mat=
-    new THREE.MeshStandardMaterial({
-      color:0x9b673d,
-      roughness:.8
-    });
-
-  const wall=
-    new THREE.Mesh(
-      geo,
-      mat
-    );
-
-  const dir=
-    new THREE.Vector3(
-      -Math.sin(yaw),
-      0,
-      -Math.cos(yaw)
-    );
-
-  wall.position.copy(
-    player.position
-  );
-
-  wall.position.addScaledVector(
-    dir,
-    4
-  );
-
-  wall.position.y=2;
-
-  wall.rotation.y=yaw;
-
-  scene.add(wall);
-
-}
-
-
-/* =====================================================
-   アイテム取得
-===================================================== */
-
-function pickup(){
-
-  if(!running)return;
-
-  for(
-    let i=items.length-1;
-    i>=0;
-    i--
-  ){
-
-    const item=items[i];
-
-    if(
-      player.position.distanceTo(
-        item.position
-      )<3
-    ){
-
-      const name=
-        item.userData.name;
-
-      if(name.includes("MED")){
-
-        hp=
-          Math.min(
-            100,
-            hp+30
-          );
-
-        updateHP();
-
-      }else{
-
-        reserve+=30;
-
-        updateAmmo();
-
+        break;
       }
-
-      scene.remove(item);
-
-      items.splice(i,1);
-
-      break;
-
     }
-
   }
+});
 
-}
+addEventListener("keydown",e=>{
 
+  if(e.key.toLowerCase()==="b"){
 
-/* =====================================================
+    if(building){
+
+      structures.push({
+        x:
+          player.x+
+          Math.sin(player.yaw)*4,
+        y:2.2,
+        z:
+          player.z+
+          Math.cos(player.yaw)*4,
+        rot:player.yaw
+      });
+
+      showMessage("🧱 建築しました！");
+    }
+  }
+});
+
+/* =========================================================
    HUD
-===================================================== */
+========================================================= */
 
-function updateHP(){
+function updateHUD(){
 
-  document.getElementById(
-    "hpText"
-  ).textContent=hp;
+  const hp=Math.max(0,Math.round(player.hp));
 
-  document.getElementById(
-    "hpBar"
-  ).style.width=
+  document.getElementById("hpText").textContent=
+    hp+" / 100";
+
+  document.getElementById("hpbar").style.width=
     hp+"%";
 
-}
+  document.getElementById("playerCount").textContent=
+    remaining;
 
-function updateAmmo(){
+  document.getElementById("stormTime").textContent=
+    Math.ceil(stormTimer);
 
-  document.getElementById(
-    "ammo"
-  ).textContent=ammo;
+  document.getElementById("ammo").textContent=
+    player.ammo+" / "+player.reserve;
 
-  document.getElementById(
-    "reserve"
-  ).textContent=reserve;
-
-}
-
-
-/* =====================================================
-   ストーム
-===================================================== */
-
-setInterval(
-  ()=>{
-
-    if(!running)return;
-
-    storm--;
-
-    document.getElementById(
-      "stormTime"
-    ).textContent=storm;
-
-    if(storm<=0){
-
-      storm=90;
-
-    }
-
-  },
-  1000
-);
-
-
-/* =====================================================
-   ゲーム開始
-===================================================== */
-
-function startGame(){
-
-  running=true;
-
-  document
-    .getElementById("lobby")
-    .classList.add("hidden");
-
-  document
-    .getElementById("hud")
-    .classList.remove("hidden");
-
-  closePanels();
-
-  hp=100;
-
-  ammo=30;
-
-  reserve=120;
-
-  storm=90;
-
-  remaining=10;
-
-  updateHP();
-
-  updateAmmo();
-
-  document.getElementById(
-    "remaining"
-  ).textContent=remaining;
-
-  player.position.set(
-    0,
-    0,
-    12
-  );
-
-}
-
-
-/* =====================================================
-   ロビーへ
-===================================================== */
-
-function returnLobby(){
-
-  running=false;
-
-  if(document.pointerLockElement){
-    document.exitPointerLock();
+  if(hp<=0){
+    gameOver();
   }
-
-  document
-    .getElementById("hud")
-    .classList.add("hidden");
-
-  document
-    .getElementById("lobby")
-    .classList.remove("hidden");
-
-  closePanels();
-
 }
 
+function showMessage(text){
 
-/* =====================================================
-   ロビー
-===================================================== */
+  const el=document.getElementById("message");
+
+  el.textContent=text;
+  el.style.opacity=1;
+
+  clearTimeout(showMessage.timer);
+
+  showMessage.timer=setTimeout(()=>{
+    el.style.opacity=0;
+  },1800);
+}
+
+/* =========================================================
+   メニュー
+========================================================= */
+
+function closeMenu(){
+  document.getElementById("menu").style.display="none";
+}
 
 function showLobby(){
 
-  closePanels();
+  closeMenu();
 
+  playing=false;
+
+  document.getElementById("lobby").style.display="block";
 }
 
+function startGame(){
 
-/* =====================================================
-   パネル
-===================================================== */
+  document.getElementById("lobby").style.display="none";
 
-function closePanels(){
+  playing=true;
 
-  document
-    .querySelectorAll(".panel")
-    .forEach(
-      p=>p.classList.add("hidden")
-    );
+  player.hp=100;
+  player.x=0;
+  player.y=1;
+  player.z=10;
+  stormTimer=90;
 
+  updateHUD();
 }
 
-function openShop(){
+function showShop(){
 
-  closePanels();
+  document.getElementById("toast").textContent=
+    "🛒 ショップ\nスキン・ツルハシ・エモートなどをここに追加できます。";
 
-  document
-    .getElementById("shopPanel")
-    .classList.remove("hidden");
+  document.getElementById("toast").style.display="block";
 
+  setTimeout(()=>{
+    document.getElementById("toast").style.display="none";
+  },2500);
 }
 
-function openLocker(){
+function showLocker(){
 
-  closePanels();
+  document.getElementById("toast").textContent=
+    "🎒 ロッカー\n現在の装備：デフォルトスキン";
 
-  document
-    .getElementById("lockerPanel")
-    .classList.remove("hidden");
+  document.getElementById("toast").style.display="block";
 
+  setTimeout(()=>{
+    document.getElementById("toast").style.display="none";
+  },2500);
 }
 
-function openNews(){
+function showNews(){
 
-  closePanels();
+  document.getElementById("toast").textContent=
+    "📰 NEWS\nCHAPTER 1：新しい島へようこそ！";
 
-  document
-    .getElementById("newsPanel")
-    .classList.remove("hidden");
+  document.getElementById("toast").style.display="block";
 
+  setTimeout(()=>{
+    document.getElementById("toast").style.display="none";
+  },2500);
 }
 
-function openAdmin(){
+function gameOver(){
 
-  closePanels();
+  playing=false;
 
-  document
-    .getElementById("loginPanel")
-    .classList.remove("hidden");
-
+  setTimeout(()=>{
+    alert("🏆 GAME OVER\n順位："+remaining);
+    showLobby();
+  },100);
 }
 
+/* =========================================================
+   メインループ
+========================================================= */
 
-/* =====================================================
-   管理ログイン
-===================================================== */
+let last=performance.now();
 
-function adminLogin(){
+function loop(now){
 
-  const user=
-    document.getElementById(
-      "adminUser"
-    ).value;
+  const dt=Math.min((now-last)/1000,.05);
+  last=now;
 
-  const pass=
-    document.getElementById(
-      "adminPass"
-    ).value;
+  update(dt);
+  render();
 
-  /*
-    デモ用ログイン
-
-    ユーザー名:
-    admin
-
-    パスワード:
-    1234
-  */
-
-  if(
-    user==="admin" &&
-    pass==="1234"
-  ){
-
-    closePanels();
-
-    document
-      .getElementById(
-        "adminPanel"
-      )
-      .classList.remove("hidden");
-
-  }else{
-
-    alert(
-      "ログイン情報が違います。\n\n"+
-      "デモ:\n"+
-      "admin / 1234"
-    );
-
-  }
-
+  requestAnimationFrame(loop);
 }
 
-
-/* =====================================================
-   ショップ
-===================================================== */
-
-function buy(item){
-
-  alert(
-    item+
-    " を購入しました！"
-  );
-
-}
-
-
-/* =====================================================
-   スキン
-===================================================== */
-
-function selectSkin(skin){
-
-  if(!playerBody)return;
-
-  if(skin==="BLUE HERO"){
-
-    playerBody.material.color
-      .set(0x2563eb);
-
-  }
-
-  if(skin==="RED HERO"){
-
-    playerBody.material.color
-      .set(0xef4444);
-
-  }
-
-  if(skin==="GREEN HERO"){
-
-    playerBody.material.color
-      .set(0x22c55e);
-
-  }
-
-  alert(
-    skin+
-    " を装備しました！"
-  );
-
-}
-
-
-/* =====================================================
-   ニュース投稿
-===================================================== */
-
-function postNews(){
-
-  const title=
-    prompt(
-      "ニュースタイトルを入力"
-    );
-
-  if(!title)return;
-
-  alert(
-    "ニュースを投稿しました:\n"+
-    title
-  );
-
-}
-
-
-/* =====================================================
-   ログアウト
-===================================================== */
-
-function logout(){
-
-  if(
-    confirm(
-      "ログアウトしますか？"
-    )
-  ){
-
-    alert(
-      "ログアウトしました。"
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   結果画面
-===================================================== */
-
-function showResult(){
-
-  running=false;
-
-  document
-    .getElementById("hud")
-    .classList.add("hidden");
-
-  document
-    .getElementById("lobby")
-    .classList.add("hidden");
-
-  document
-    .getElementById("resultPanel")
-    .classList.remove("hidden");
-
-}
-
-
-/* =====================================================
-   アニメーション
-===================================================== */
-
-function animate(){
-
-  requestAnimationFrame(
-    animate
-  );
-
-  const dt=
-    Math.min(
-      clock.getDelta(),
-      .05
-    );
-
-  updatePlayer(dt);
-
-  updateCamera();
-
-  updateBullets(dt);
-
-  /* アイテム回転 */
-
-  items.forEach(
-    item=>{
-      item.rotation.y+=dt*2;
-      item.position.y=
-        .8+
-        Math.sin(
-          performance.now()*.003
-        )*.15;
-    }
-  );
-
-  renderer.render(
-    scene,
-    camera
-  );
-
-}
-
-
-/* =====================================================
-   リサイズ
-===================================================== */
-
-function resize(){
-
-  camera.aspect=
-    innerWidth/innerHeight;
-
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(
-    innerWidth,
-    innerHeight
-  );
-
-}
-
-
-/* =====================================================
-   起動
-===================================================== */
-
-init3D();
+updateHUD();
+requestAnimationFrame(loop);
 
 </script>
-
 </body>
 </html>
