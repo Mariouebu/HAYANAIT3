@@ -1,0 +1,1635 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sky Island Royale</title>
+
+<style>
+*{
+  box-sizing:border-box
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#111;
+  font-family:Arial,sans-serif
+}
+
+canvas{
+  display:block
+}
+
+.screen{
+  position:fixed;
+  inset:0;
+  z-index:10;
+  color:#fff
+}
+
+.hidden{
+  display:none!important
+}
+
+/* ロビー */
+
+#lobby{
+  background:
+    linear-gradient(
+      180deg,
+      #234a6655,
+      #050a19e8
+    )
+}
+
+.logo{
+  position:absolute;
+  top:42px;
+  left:42px;
+  font-size:48px;
+  font-weight:900;
+  text-shadow:4px 4px #000
+}
+
+.logo b{
+  color:#ffd400
+}
+
+.panel{
+  position:absolute;
+  left:42px;
+  bottom:42px;
+  width:330px;
+  display:grid;
+  gap:12px
+}
+
+.panel button,
+#result button{
+  border:0;
+  border-radius:12px;
+  padding:15px;
+  font-size:20px;
+  font-weight:800;
+  cursor:pointer
+}
+
+.panel #play{
+  font-size:30px;
+  background:#ffd400
+}
+
+.info{
+  position:absolute;
+  right:25px;
+  top:25px;
+  background:#0009;
+  padding:14px 18px;
+  border-radius:12px
+}
+
+/* ローディング・結果 */
+
+#loading,
+#result{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background:#000b
+}
+
+/* HUD */
+
+#hud{
+  position:fixed;
+  inset:0;
+  z-index:5;
+  color:#fff;
+  pointer-events:none;
+  text-shadow:2px 2px #000
+}
+
+#count{
+  position:absolute;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:22px
+}
+
+#cross{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:24px;
+  height:24px
+}
+
+#cross:before,
+#cross:after{
+  content:"";
+  position:absolute;
+  background:#fff
+}
+
+#cross:before{
+  width:24px;
+  height:2px;
+  top:11px
+}
+
+#cross:after{
+  height:24px;
+  width:2px;
+  left:11px
+}
+
+#hpwrap{
+  position:absolute;
+  left:20px;
+  bottom:20px;
+  width:280px
+}
+
+.bar{
+  height:22px;
+  background:#222;
+  border:2px solid #fff
+}
+
+.fill{
+  height:100%;
+  width:100%;
+  background:#27d45a
+}
+
+#weapon{
+  position:absolute;
+  right:22px;
+  bottom:58px;
+  font-size:24px
+}
+
+#ammo{
+  position:absolute;
+  right:22px;
+  bottom:22px;
+  font-size:20px
+}
+
+#help{
+  position:absolute;
+  left:18px;
+  top:18px;
+  font-size:13px
+}
+
+#toast{
+  position:absolute;
+  left:50%;
+  top:65%;
+  transform:translate(-50%,-50%);
+  font-size:30px;
+  font-weight:900
+}
+</style>
+</head>
+
+<body>
+
+<!-- ==================== ロビー ==================== -->
+
+<div id="lobby" class="screen">
+
+  <div class="logo">
+    SKY <b>ISLAND</b> ROYALE
+  </div>
+
+  <div class="info">
+    🌐 <span id="status">接続中...</span>
+    <br>
+    👥 <span id="lobbyCount">0</span>/100
+  </div>
+
+  <div class="panel">
+
+    <button id="play">
+      ▶ PLAY
+    </button>
+
+    <button id="locker">
+      🎒 ロッカー
+    </button>
+
+    <button id="settings">
+      ⚙ 設定
+    </button>
+
+  </div>
+
+</div>
+
+<!-- ==================== ローディング ==================== -->
+
+<div id="loading" class="screen hidden">
+
+  <h1>
+    マッチに参加中...
+  </h1>
+
+  <p>
+    サーバーに接続しています
+  </p>
+
+</div>
+
+<!-- ==================== HUD ==================== -->
+
+<div id="hud" class="hidden">
+
+  <div id="count">
+    👥
+    <span id="playerCount">0</span>
+    /100
+  </div>
+
+  <div id="help">
+
+    WASD:移動　
+    Shift:ダッシュ　
+    左クリック:射撃　
+    1/2/3:武器　
+    B:壁　
+    V:床　
+    N:階段　
+    E:拾う
+
+    <br>
+
+    ゲームパッド:
+    左スティック移動 /
+    右スティック視点 /
+    RT射撃
+
+  </div>
+
+  <div id="cross"></div>
+
+  <div id="hpwrap">
+
+    HP
+    <span id="hpText">100</span>
+
+    <div class="bar">
+      <div id="hp" class="fill"></div>
+    </div>
+
+  </div>
+
+  <div id="weapon">
+
+    🔫
+    <span id="weaponName">
+      AR
+    </span>
+
+  </div>
+
+  <div id="ammo">
+
+    弾薬
+    <span id="ammoText">
+      30
+    </span>
+
+  </div>
+
+  <div id="toast"></div>
+
+</div>
+
+<!-- ==================== リザルト ==================== -->
+
+<div id="result" class="screen hidden">
+
+  <h1 id="resultTitle">
+    RESULT
+  </h1>
+
+  <p id="resultText"></p>
+
+  <button onclick="location.reload()">
+    🔄 ロビーへ戻る
+  </button>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script type="module">
+
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+
+/* =========================
+   基本変数
+========================= */
+
+const socket = io();
+
+let scene;
+let camera;
+let renderer;
+let clock;
+
+let me;
+
+let started = false;
+
+let mouseFire = false;
+
+let yaw = 0;
+let pitch = .15;
+
+let lastShot = 0;
+
+let gamepad = null;
+
+const keys = {};
+
+const others = new Map();
+
+const builds = new Map();
+
+const items = new Map();
+
+let hp = 100;
+
+let weapon = "AR";
+
+const ammo = {
+
+  AR:30,
+
+  SMG:40,
+
+  Shotgun:8
+
+};
+
+const W = {
+
+  AR:{
+    rate:160,
+    damage:25
+  },
+
+  SMG:{
+    rate:80,
+    damage:12
+  },
+
+  Shotgun:{
+    rate:700,
+    damage:12
+  }
+
+};
+
+/* =========================
+   DOM
+========================= */
+
+const $ = x =>
+  document.getElementById(x);
+
+const show = x =>
+  $(x).classList.remove("hidden");
+
+const hide = x =>
+  $(x).classList.add("hidden");
+
+/* =========================
+   プレイヤー
+========================= */
+
+function char(color){
+
+  const g =
+    new THREE.Group();
+
+  const body =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        1.1,
+        1.7,
+        .75
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color
+      })
+
+    );
+
+  body.position.y = .85;
+
+  const head =
+    new THREE.Mesh(
+
+      new THREE.SphereGeometry(
+        .42,
+        12,
+        12
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color:0xffc39b
+      })
+
+    );
+
+  head.position.y = 1.95;
+
+  g.add(body);
+  g.add(head);
+
+  return g;
+}
+
+/* =========================
+   3Dワールド
+========================= */
+
+function init(){
+
+  scene =
+    new THREE.Scene();
+
+  scene.background =
+    new THREE.Color(
+      0x82cfff
+    );
+
+  scene.fog =
+    new THREE.Fog(
+      0x82cfff,
+      100,
+      650
+    );
+
+  camera =
+    new THREE.PerspectiveCamera(
+      70,
+      innerWidth / innerHeight,
+      .1,
+      1000
+    );
+
+  renderer =
+    new THREE.WebGLRenderer({
+      antialias:true
+    });
+
+  renderer.setSize(
+    innerWidth,
+    innerHeight
+  );
+
+  renderer.shadowMap.enabled = true;
+
+  document.body.appendChild(
+    renderer.domElement
+  );
+
+  scene.add(
+    new THREE.HemisphereLight(
+      0xffffff,
+      0x477744,
+      1.4
+    )
+  );
+
+  const sun =
+    new THREE.DirectionalLight(
+      0xffffff,
+      2
+    );
+
+  sun.position.set(
+    120,
+    200,
+    80
+  );
+
+  scene.add(sun);
+
+  const ground =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        600,
+        600
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color:0x54ad50
+      })
+
+    );
+
+  ground.rotation.x =
+    -Math.PI / 2;
+
+  scene.add(ground);
+
+  for(
+    let i = 0;
+    i < 80;
+    i++
+  ){
+
+    mapObj();
+
+  }
+
+  clock =
+    new THREE.Clock();
+
+  resize();
+
+  requestAnimationFrame(
+    loop
+  );
+
+}
+
+/* =========================
+   マップオブジェクト
+========================= */
+
+function mapObj(){
+
+  const x =
+    (Math.random()-.5)*520;
+
+  const z =
+    (Math.random()-.5)*520;
+
+  if(
+    Math.random() < .6
+  ){
+
+    const t =
+      new THREE.Mesh(
+
+        new THREE.CylinderGeometry(
+          .5,
+          .8,
+          4,
+          8
+        ),
+
+        new THREE.MeshStandardMaterial({
+          color:0x704214
+        })
+
+      );
+
+    t.position.set(
+      x,
+      2,
+      z
+    );
+
+    scene.add(t);
+
+    const c =
+      new THREE.Mesh(
+
+        new THREE.SphereGeometry(
+          3,
+          10,
+          10
+        ),
+
+        new THREE.MeshStandardMaterial({
+          color:0x218b3a
+        })
+
+      );
+
+    c.position.set(
+      x,
+      6,
+      z
+    );
+
+    scene.add(c);
+
+  }else{
+
+    const h =
+      6 +
+      Math.random()*8;
+
+    const m =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          10,
+          h,
+          10
+        ),
+
+        new THREE.MeshStandardMaterial({
+          color:0x777777
+        })
+
+      );
+
+    m.position.set(
+      x,
+      h/2,
+      z
+    );
+
+    scene.add(m);
+
+  }
+
+}
+
+/* =========================
+   他プレイヤー
+========================= */
+
+function addOther(p){
+
+  if(
+    p.id === socket.id ||
+    others.has(p.id)
+  )
+    return;
+
+  const g =
+    char(0xe33d3d);
+
+  g.position.set(
+    p.x,
+    p.y,
+    p.z
+  );
+
+  scene.add(g);
+
+  others.set(
+    p.id,
+    g
+  );
+
+}
+
+/* =========================
+   建築
+========================= */
+
+function createBuild(b){
+
+  if(
+    builds.has(b.id)
+  )
+    return;
+
+  let geometry;
+
+  if(
+    b.type === "wall"
+  ){
+
+    geometry =
+      new THREE.BoxGeometry(
+        6,
+        3,
+        .3
+      );
+
+  }else{
+
+    geometry =
+      new THREE.BoxGeometry(
+        6,
+        .3,
+        6
+      );
+
+  }
+
+  const m =
+    new THREE.Mesh(
+
+      geometry,
+
+      new THREE.MeshStandardMaterial({
+        color:0x3d9cff
+      })
+
+    );
+
+  m.position.set(
+    b.x,
+    b.y,
+    b.z
+  );
+
+  m.rotation.y =
+    b.ry;
+
+  if(
+    b.type === "ramp"
+  ){
+
+    m.rotation.x =
+      -Math.PI / 6;
+
+  }
+
+  scene.add(m);
+
+  builds.set(
+    b.id,
+    m
+  );
+
+}
+
+/* =========================
+   アイテム
+========================= */
+
+function createItem(i){
+
+  if(
+    items.has(i.id)
+  )
+    return;
+
+  let color;
+
+  if(
+    i.type === "heal"
+  )
+    color = 0x40e070;
+
+  else if(
+    i.type === "ammo"
+  )
+    color = 0xffc400;
+
+  else
+    color = 0xff66dd;
+
+  const m =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        .8,
+        .8,
+        .8
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color,
+        emissive:color,
+        emissiveIntensity:.2
+      })
+
+    );
+
+  m.position.set(
+    i.x,
+    i.y+.5,
+    i.z
+  );
+
+  scene.add(m);
+
+  items.set(
+    i.id,
+    m
+  );
+
+}
+
+/* =========================
+   ゲーム開始
+========================= */
+
+function start(s){
+
+  hide("lobby");
+  hide("loading");
+  show("hud");
+
+  started = true;
+
+  me =
+    char(0x2764ff);
+
+  me.position.set(
+    s.me.x,
+    s.me.y,
+    s.me.z
+  );
+
+  scene.add(me);
+
+  s.players.forEach(
+    addOther
+  );
+
+  s.buildings.forEach(
+    createBuild
+  );
+
+  s.items.forEach(
+    createItem
+  );
+
+}
+
+/* =========================
+   移動
+========================= */
+
+function move(dt,g){
+
+  let x =
+    (keys.d ? 1:0) -
+    (keys.a ? 1:0);
+
+  let z =
+    (keys.s ? 1:0) -
+    (keys.w ? 1:0);
+
+  if(g){
+
+    x +=
+      g.axes[0] || 0;
+
+    z +=
+      g.axes[1] || 0;
+
+  }
+
+  if(
+    Math.hypot(x,z) < .12
+  )
+    return;
+
+  const l =
+    Math.hypot(x,z);
+
+  x /= l;
+  z /= l;
+
+  const sp =
+    keys.shift ||
+    g?.buttons[10]?.pressed
+      ? 22
+      : 12;
+
+  const rx =
+    x * Math.cos(yaw) -
+    z * Math.sin(yaw);
+
+  const rz =
+    x * Math.sin(yaw) +
+    z * Math.cos(yaw);
+
+  me.position.x =
+    THREE.MathUtils.clamp(
+      me.position.x +
+      rx * sp * dt,
+      -290,
+      290
+    );
+
+  me.position.z =
+    THREE.MathUtils.clamp(
+      me.position.z +
+      rz * sp * dt,
+      -290,
+      290
+    );
+
+  me.rotation.y =
+    yaw + Math.PI;
+
+}
+
+/* =========================
+   カメラ
+========================= */
+
+function cam(){
+
+  if(!me)
+    return;
+
+  camera.position.set(
+
+    me.position.x +
+      Math.sin(yaw)*7,
+
+    me.position.y +
+      3 +
+      pitch*1.5,
+
+    me.position.z +
+      Math.cos(yaw)*7
+
+  );
+
+  camera.lookAt(
+
+    me.position.x,
+
+    me.position.y+1.4,
+
+    me.position.z
+
+  );
+
+}
+
+/* =========================
+   射撃
+========================= */
+
+function shoot(){
+
+  const now =
+    performance.now();
+
+  const w =
+    W[weapon];
+
+  if(
+    !me ||
+    now-lastShot < w.rate ||
+    ammo[weapon] <= 0
+  )
+    return;
+
+  lastShot =
+    now;
+
+  ammo[weapon]--;
+
+  const d =
+    new THREE.Vector3();
+
+  camera.getWorldDirection(d);
+
+  socket.emit(
+    "shoot",
+    {
+      weapon,
+
+      direction:{
+        x:d.x,
+        y:d.y,
+        z:d.z
+      }
+    }
+  );
+
+}
+
+/* =========================
+   建築
+========================= */
+
+function build(type){
+
+  if(!me)
+    return;
+
+  const d = 5;
+
+  socket.emit(
+    "build",
+    {
+
+      type,
+
+      x:
+        me.position.x -
+        Math.sin(yaw)*d,
+
+      y:
+        me.position.y+1.5,
+
+      z:
+        me.position.z -
+        Math.cos(yaw)*d,
+
+      ry:yaw
+
+    }
+  );
+
+}
+
+/* =========================
+   アイテム取得
+========================= */
+
+function pickup(){
+
+  let best = null;
+
+  let bd = 4;
+
+  for(
+    const [id,m]
+    of items
+  ){
+
+    const d =
+      m.position.distanceTo(
+        me.position
+      );
+
+    if(
+      d < bd
+    ){
+
+      bd = d;
+
+      best = id;
+
+    }
+
+  }
+
+  if(best)
+    socket.emit(
+      "pickupItem",
+      best
+    );
+
+}
+
+/* =========================
+   HUD
+========================= */
+
+function hud(){
+
+  $("hpText").textContent =
+    Math.ceil(hp);
+
+  $("hp").style.width =
+    Math.max(
+      0,
+      hp
+    ) + "%";
+
+  $("weaponName").textContent =
+    weapon;
+
+  $("ammoText").textContent =
+    ammo[weapon];
+
+}
+
+/* =========================
+   ゲームループ
+========================= */
+
+function loop(){
+
+  requestAnimationFrame(
+    loop
+  );
+
+  const dt =
+    Math.min(
+      clock.getDelta(),
+      .05
+    );
+
+  if(started){
+
+    const gps =
+      navigator.getGamepads?.() || [];
+
+    const g =
+      gamepad != null
+        ? gps[gamepad]
+        : gps[0];
+
+    if(g){
+
+      if(
+        Math.abs(g.axes[2]) > .12
+      ){
+
+        yaw -=
+          g.axes[2] * .055;
+
+      }
+
+      if(
+        Math.abs(g.axes[3]) > .12
+      ){
+
+        pitch =
+          THREE.MathUtils.clamp(
+            pitch -
+            g.axes[3]*.035,
+            -.8,
+            .8
+          );
+
+      }
+
+      if(
+        g.buttons[7]?.pressed
+      )
+        shoot();
+
+    }
+
+    move(
+      dt,
+      g
+    );
+
+    cam();
+
+    if(mouseFire)
+      shoot();
+
+    socket.emit(
+      "move",
+      {
+        x:me.position.x,
+        y:me.position.y,
+        z:me.position.z,
+        yaw
+      }
+    );
+
+    hud();
+
+  }
+
+  renderer.render(
+    scene,
+    camera
+  );
+
+}
+
+/* =========================
+   Socket.IO
+========================= */
+
+socket.on(
+  "connect",
+  () => {
+
+    $("status").textContent =
+      "オンライン";
+
+    $("play").disabled =
+      false;
+
+  }
+);
+
+socket.on(
+  "playerCount",
+  d => {
+
+    $("lobbyCount").textContent =
+      d.count;
+
+    $("playerCount").textContent =
+      d.count;
+
+  }
+);
+
+socket.on(
+  "matchState",
+  start
+);
+
+socket.on(
+  "playerJoined",
+  addOther
+);
+
+socket.on(
+  "playerMoved",
+  p => {
+
+    let g =
+      others.get(p.id);
+
+    if(!g){
+
+      addOther(p);
+
+      g =
+        others.get(p.id);
+
+    }
+
+    g.position.set(
+      p.x,
+      p.y,
+      p.z
+    );
+
+    g.rotation.y =
+      p.yaw + Math.PI;
+
+  }
+);
+
+socket.on(
+  "playerLeft",
+  id => {
+
+    const g =
+      others.get(id);
+
+    if(g)
+      scene.remove(g);
+
+    others.delete(id);
+
+  }
+);
+
+socket.on(
+  "buildingCreated",
+  createBuild
+);
+
+socket.on(
+  "itemPickedUp",
+  d => {
+
+    const m =
+      items.get(
+        d.itemId
+      );
+
+    if(m){
+
+      scene.remove(m);
+
+      items.delete(
+        d.itemId
+      );
+
+    }
+
+  }
+);
+
+socket.on(
+  "reward",
+  d => {
+
+    if(
+      d.type === "heal"
+    ){
+
+      hp =
+        Math.min(
+          100,
+          hp+35
+        );
+
+    }
+
+    if(
+      d.type === "ammo"
+    ){
+
+      ammo.AR += 15;
+      ammo.SMG += 25;
+      ammo.Shotgun += 3;
+
+    }
+
+    if(
+      W[d.type]
+    ){
+
+      weapon =
+        d.type;
+
+      ammo[d.type] += 10;
+
+    }
+
+  }
+);
+
+socket.on(
+  "damage",
+  d => {
+
+    hp =
+      Math.max(
+        0,
+        hp-d.amount
+      );
+
+    hud();
+
+    if(
+      hp <= 0
+    ){
+
+      alert(
+        "💀 脱落しました"
+      );
+
+    }
+
+  }
+);
+
+socket.on(
+  "eliminated",
+  d => {
+
+    const g =
+      others.get(
+        d.id
+      );
+
+    if(g)
+      scene.remove(g);
+
+    others.delete(
+      d.id
+    );
+
+  }
+);
+
+socket.on(
+  "winner",
+  d => {
+
+    started =
+      false;
+
+    hide("hud");
+
+    show("result");
+
+    $("resultTitle").textContent =
+      d.id === socket.id
+        ? "🏆 VICTORY!"
+        : "🏆 RESULT";
+
+    $("resultText").textContent =
+      d.id === socket.id
+        ? "最後まで生き残りました！"
+        : "試合終了";
+
+  }
+);
+
+socket.on(
+  "serverFull",
+  () => {
+
+    hide("loading");
+
+    alert(
+      "満員です。最大100人です。"
+    );
+
+  }
+);
+
+/* =========================
+   ボタン
+========================= */
+
+$("play").onclick =
+  () => {
+
+    show("loading");
+
+    socket.emit(
+      "play"
+    );
+
+  };
+
+$("locker").onclick =
+  () => {
+
+    alert(
+      "🎒 ロッカー\nSky Ranger"
+    );
+
+  };
+
+$("settings").onclick =
+  () => {
+
+    alert(
+      "⚙ 設定\nキーボード・マウス・ゲームパッド対応"
+    );
+
+  };
+
+/* =========================
+   キーボード
+========================= */
+
+addEventListener(
+  "keydown",
+  e => {
+
+    keys[
+      e.key.toLowerCase()
+    ] = true;
+
+    if(e.key === "1")
+      weapon = "AR";
+
+    if(e.key === "2")
+      weapon = "SMG";
+
+    if(e.key === "3")
+      weapon = "Shotgun";
+
+    if(
+      e.key.toLowerCase() === "b"
+    )
+      build("wall");
+
+    if(
+      e.key.toLowerCase() === "v"
+    )
+      build("floor");
+
+    if(
+      e.key.toLowerCase() === "n"
+    )
+      build("ramp");
+
+    if(
+      e.key.toLowerCase() === "e"
+    )
+      pickup();
+
+  }
+);
+
+addEventListener(
+  "keyup",
+  e => {
+
+    keys[
+      e.key.toLowerCase()
+    ] = false;
+
+  }
+);
+
+/* =========================
+   マウス
+========================= */
+
+addEventListener(
+  "mousedown",
+  e => {
+
+    if(
+      started &&
+      e.button === 0
+    ){
+
+      mouseFire = true;
+
+      renderer.domElement
+        .requestPointerLock();
+
+    }
+
+  }
+);
+
+addEventListener(
+  "mouseup",
+  e => {
+
+    if(
+      e.button === 0
+    )
+      mouseFire = false;
+
+  }
+);
+
+addEventListener(
+  "mousemove",
+  e => {
+
+    if(
+      document.pointerLockElement ===
+      renderer.domElement
+    ){
+
+      yaw -=
+        e.movementX * .003;
+
+      pitch =
+        THREE.MathUtils.clamp(
+          pitch -
+          e.movementY*.0025,
+          -.8,
+          .8
+        );
+
+    }
+
+  }
+);
+
+/* =========================
+   ゲームパッド
+========================= */
+
+addEventListener(
+  "gamepadconnected",
+  e => {
+
+    gamepad =
+      e.gamepad.index;
+
+    $("toast").textContent =
+      "🎮 コントローラー接続";
+
+  }
+);
+
+/* =========================
+   リサイズ
+========================= */
+
+addEventListener(
+  "resize",
+  resize
+);
+
+function resize(){
+
+  if(!camera)
+    return;
+
+  camera.aspect =
+    innerWidth /
+    innerHeight;
+
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(
+    innerWidth,
+    innerHeight
+  );
+
+}
+
+/* =========================
+   起動
+========================= */
+
+init();
+
+</script>
+
+</body>
+</html>
