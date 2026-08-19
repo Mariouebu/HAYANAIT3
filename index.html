@@ -1,1 +1,2541 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKY ISLAND ROYALE - OFFLINE</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #111;
+  font-family: Arial, "Noto Sans JP", sans-serif;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* =========================
+   ロビー
+========================= */
+
+#lobby,
+#settings,
+#result {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      rgba(80, 160, 255, 0.35),
+      transparent 35%
+    ),
+    linear-gradient(
+      #182e55,
+      #07101e
+    );
+}
+
+#lobby h1 {
+  margin: 0;
+  font-size: clamp(42px, 7vw, 80px);
+  text-shadow: 0 6px 20px rgba(0,0,0,.8);
+}
+
+#lobby .subtitle {
+  font-size: 20px;
+  color: #cfe5ff;
+  margin: 8px 0 30px;
+}
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 14px 30px;
+  margin: 7px;
+  font-size: 19px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #172033;
+  background: white;
+  box-shadow: 0 5px 18px rgba(0,0,0,.45);
+  transition: transform .15s;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+.playButton {
+  background: #35d56b;
+  color: white;
+  font-size: 28px;
+  padding: 18px 75px;
+}
+
+#lockerText {
+  min-height: 25px;
+  color: #bfe0ff;
+}
+
+/* =========================
+   設定
+========================= */
+
+#settings h2,
+#result h2 {
+  font-size: 45px;
+  margin: 0 0 20px;
+}
+
+#settings p {
+  color: #d9e7f7;
+}
+
+#settings input {
+  width: 280px;
+}
+
+/* =========================
+   HUD
+========================= */
+
+#hud {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  color: white;
+}
+
+#topHUD {
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  top: 15px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.panel {
+  background: rgba(5, 12, 25, .78);
+  padding: 10px 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.5);
+}
+
+#healthOuter {
+  width: 240px;
+  height: 22px;
+  margin-top: 5px;
+  overflow: hidden;
+  border: 2px solid white;
+  border-radius: 7px;
+  background: #222;
+}
+
+#health {
+  width: 100%;
+  height: 100%;
+  background: #36d66b;
+  transition: width .15s;
+}
+
+#hpText {
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+#weapon {
+  position: absolute;
+  right: 20px;
+  bottom: 25px;
+  text-align: right;
+  font-size: 20px;
+}
+
+#ammo {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+#crosshair {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+}
+
+#crosshair::before,
+#crosshair::after {
+  content: "";
+  position: absolute;
+  background: white;
+  box-shadow: 0 0 4px black;
+}
+
+#crosshair::before {
+  width: 20px;
+  height: 2px;
+  left: 0;
+  top: 9px;
+}
+
+#crosshair::after {
+  width: 2px;
+  height: 20px;
+  left: 9px;
+  top: 0;
+}
+
+#message {
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 0 2px 6px black;
+  white-space: nowrap;
+}
+
+#help {
+  position: absolute;
+  left: 15px;
+  bottom: 15px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: rgba(0,0,0,.65);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =========================
+   リザルト
+========================= */
+
+#resultInfo {
+  font-size: 23px;
+  color: #d9e7f7;
+  margin-bottom: 20px;
+}
+
+/* =========================
+   モバイル
+========================= */
+
+@media (max-width: 600px) {
+
+  #healthOuter {
+    width: 160px;
+  }
+
+  #help {
+    font-size: 10px;
+  }
+
+  #weapon {
+    font-size: 15px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="game"></canvas>
+
+<!-- =========================
+     ロビー
+========================= -->
+
+<div id="lobby">
+
+  <h1>SKY ISLAND</h1>
+
+  <div class="subtitle">
+    OFFLINE ROYALE
+  </div>
+
+  <p>
+    CPUと戦う三人称バトルロイヤル
+  </p>
+
+  <button
+    class="playButton"
+    onclick="startGame()"
+  >
+    ▶ PLAY
+  </button>
+
+  <button onclick="openSettings()">
+    ⚙ 設定
+  </button>
+
+  <button onclick="locker()">
+    🎒 ロッカー
+  </button>
+
+  <p id="lockerText"></p>
+
+</div>
+
+<!-- =========================
+     設定
+========================= -->
+
+<div id="settings" class="hidden">
+
+  <h2>⚙ 設定</h2>
+
+  <p>マウス感度</p>
+
+  <input
+    id="sens"
+    type="range"
+    min="1"
+    max="20"
+    value="8"
+  >
+
+  <p>
+    🎮 Switchコントローラー対応
+  </p>
+
+  <p>
+    左スティック：移動<br>
+    右スティック：カメラ
+  </p>
+
+  <button onclick="closeSettings()">
+    戻る
+  </button>
+
+</div>
+
+<!-- =========================
+     リザルト
+========================= -->
+
+<div id="result" class="hidden">
+
+  <h2 id="resultTitle">
+    🏆 VICTORY ROYALE!
+  </h2>
+
+  <div id="resultInfo"></div>
+
+  <button
+    class="playButton"
+    onclick="startGame()"
+  >
+    もう一度
+  </button>
+
+  <button onclick="backLobby()">
+    🔄 ロビーへ戻る
+  </button>
+
+</div>
+
+<!-- =========================
+     HUD
+========================= -->
+
+<div id="hud" class="hidden">
+
+  <div id="topHUD">
+
+    <div class="panel">
+
+      <div>❤️ HP</div>
+
+      <div id="healthOuter">
+        <div id="health"></div>
+      </div>
+
+      <div id="hpText">
+        100 / 100
+      </div>
+
+    </div>
+
+    <div class="panel">
+      👥 残り
+      <span id="alive">
+        10
+      </span>
+    </div>
+
+  </div>
+
+  <div id="message"></div>
+
+  <div id="crosshair"></div>
+
+  <div id="weapon" class="panel">
+
+    🔫
+    <span id="weaponName">
+      RIFLE
+    </span>
+
+    <br>
+
+    <span id="ammo">
+      30
+    </span>
+    / ∞
+
+  </div>
+
+  <div id="help">
+
+    WASD：移動　
+    SHIFT：ダッシュ　
+    左クリック：射撃　
+    E：アイテム<br>
+
+    B：建築　
+    1/2/3：武器　
+    ESC：ロビー
+
+  </div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   SKY ISLAND ROYALE
+   完全オフライン版
+   外部ライブラリなし
+========================================================= */
+
+"use strict";
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let W = window.innerWidth;
+let H = window.innerHeight;
+
+function resizeCanvas() {
+
+  W = window.innerWidth;
+  H = window.innerHeight;
+
+  canvas.width = W;
+  canvas.height = H;
+}
+
+window.addEventListener(
+  "resize",
+  resizeCanvas
+);
+
+resizeCanvas();
+
+/* =========================================================
+   ゲーム状態
+========================================================= */
+
+let playing = false;
+let gameOver = false;
+
+let lastTime = performance.now();
+
+const player = {
+
+  x: 0,
+  y: 0,
+  z: 5,
+
+  yaw: 0,
+  pitch: 0.12,
+
+  hp: 100,
+  maxHp: 100,
+
+  speed: 6,
+  sprint: 10,
+
+  weapon: 0,
+  ammo: 30,
+
+  kills: 0,
+  materials: 40
+};
+
+/* =========================================================
+   武器
+========================================================= */
+
+const weapons = [
+
+  {
+    name: "RIFLE",
+    damage: 25,
+    range: 45,
+    rate: 0.14
+  },
+
+  {
+    name: "SHOTGUN",
+    damage: 55,
+    range: 18,
+    rate: 0.55
+  },
+
+  {
+    name: "SMG",
+    damage: 12,
+    range: 30,
+    rate: 0.07
+  }
+
+];
+
+/* =========================================================
+   オブジェクト
+========================================================= */
+
+let enemies = [];
+let items = [];
+let builds = [];
+let particles = [];
+
+/* =========================================================
+   マップ
+========================================================= */
+
+const map = {
+
+  size: 70,
+
+  obstacles: [
+
+    {
+      x: -15,
+      z: -15,
+      w: 10,
+      d: 8,
+      h: 5
+    },
+
+    {
+      x: 16,
+      z: -18,
+      w: 12,
+      d: 7,
+      h: 4
+    },
+
+    {
+      x: -22,
+      z: 18,
+      w: 8,
+      d: 13,
+      h: 6
+    },
+
+    {
+      x: 18,
+      z: 17,
+      w: 9,
+      d: 10,
+      h: 5
+    },
+
+    {
+      x: 0,
+      z: -30,
+      w: 12,
+      d: 5,
+      h: 3
+    },
+
+    {
+      x: 0,
+      z: 27,
+      w: 14,
+      d: 6,
+      h: 4
+    }
+
+  ]
+};
+
+/* =========================================================
+   キーボード
+========================================================= */
+
+const keys = {};
+
+window.addEventListener(
+  "keydown",
+  function(event) {
+
+    keys[event.key.toLowerCase()] = true;
+
+    if (event.key === "Escape") {
+
+      if (playing) {
+        backLobby();
+      }
+
+    }
+
+    if (!playing) return;
+
+    const key = event.key.toLowerCase();
+
+    if (key === "b") {
+      buildWall();
+    }
+
+    if (key === "e") {
+      pickup();
+    }
+
+    if (event.key === "1") {
+      selectWeapon(0);
+    }
+
+    if (event.key === "2") {
+      selectWeapon(1);
+    }
+
+    if (event.key === "3") {
+      selectWeapon(2);
+    }
+
+  }
+);
+
+window.addEventListener(
+  "keyup",
+  function(event) {
+
+    keys[event.key.toLowerCase()] = false;
+
+  }
+);
+
+/* =========================================================
+   マウス
+========================================================= */
+
+let mouseDown = false;
+
+let mouseDX = 0;
+let mouseDY = 0;
+
+canvas.addEventListener(
+  "mousedown",
+  function(event) {
+
+    if (event.button === 0) {
+
+      mouseDown = true;
+
+      shoot();
+
+    }
+
+  }
+);
+
+window.addEventListener(
+  "mouseup",
+  function() {
+
+    mouseDown = false;
+
+  }
+);
+
+window.addEventListener(
+  "mousemove",
+  function(event) {
+
+    if (!playing) return;
+
+    if (
+      document.pointerLockElement === canvas
+    ) {
+
+      mouseDX += event.movementX;
+      mouseDY += event.movementY;
+
+    }
+
+  }
+);
+
+canvas.addEventListener(
+  "click",
+  function() {
+
+    if (!playing) return;
+
+    if (canvas.requestPointerLock) {
+      canvas.requestPointerLock();
+    }
+
+  }
+);
+
+/* =========================================================
+   コントローラー
+========================================================= */
+
+let gamepad = null;
+
+window.addEventListener(
+  "gamepadconnected",
+  function(event) {
+
+    gamepad = event.gamepad;
+
+    showMessage(
+      "🎮 コントローラー接続"
+    );
+
+  }
+);
+
+window.addEventListener(
+  "gamepaddisconnected",
+  function() {
+
+    gamepad = null;
+
+  }
+);
+
+function getGamepad() {
+
+  if (!navigator.getGamepads) {
+    return null;
+  }
+
+  const pads = navigator.getGamepads();
+
+  if (gamepad) {
+
+    for (const pad of pads) {
+
+      if (
+        pad &&
+        pad.index === gamepad.index
+      ) {
+
+        return pad;
+
+      }
+
+    }
+
+  }
+
+  if (pads[0]) {
+    gamepad = pads[0];
+  }
+
+  return gamepad;
+}
+
+function deadzone(value) {
+
+  if (Math.abs(value) < 0.15) {
+    return 0;
+  }
+
+  return value;
+}
+
+/* =========================================================
+   ロビー
+========================================================= */
+
+function startGame() {
+
+  document
+    .getElementById("lobby")
+    .classList.add("hidden");
+
+  document
+    .getElementById("result")
+    .classList.add("hidden");
+
+  document
+    .getElementById("settings")
+    .classList.add("hidden");
+
+  document
+    .getElementById("hud")
+    .classList.remove("hidden");
+
+  playing = true;
+  gameOver = false;
+
+  player.x = 0;
+  player.y = 0;
+  player.z = 5;
+
+  player.yaw = 0;
+  player.pitch = 0.12;
+
+  player.hp = 100;
+
+  player.weapon = 0;
+  player.ammo = 30;
+
+  player.kills = 0;
+  player.materials = 40;
+
+  enemies = [];
+  items = [];
+  builds = [];
+  particles = [];
+
+  createEnemies(9);
+  createItems(18);
+
+  updateHUD();
+
+  showMessage(
+    "BATTLE START!"
+  );
+
+}
+
+function backLobby() {
+
+  playing = false;
+
+  if (document.exitPointerLock) {
+    document.exitPointerLock();
+  }
+
+  document
+    .getElementById("hud")
+    .classList.add("hidden");
+
+  document
+    .getElementById("result")
+    .classList.add("hidden");
+
+  document
+    .getElementById("settings")
+    .classList.add("hidden");
+
+  document
+    .getElementById("lobby")
+    .classList.remove("hidden");
+
+}
+
+function openSettings() {
+
+  document
+    .getElementById("lobby")
+    .classList.add("hidden");
+
+  document
+    .getElementById("settings")
+    .classList.remove("hidden");
+
+}
+
+function closeSettings() {
+
+  document
+    .getElementById("settings")
+    .classList.add("hidden");
+
+  document
+    .getElementById("lobby")
+    .classList.remove("hidden");
+
+}
+
+function locker() {
+
+  document.getElementById(
+    "lockerText"
+  ).textContent =
+    "🎒 装備：RIFLE / SHOTGUN / SMG";
+
+}
+
+/* =========================================================
+   敵生成
+========================================================= */
+
+function createEnemies(count) {
+
+  for (let i = 0; i < count; i++) {
+
+    const angle =
+      Math.random() * Math.PI * 2;
+
+    const radius =
+      20 + Math.random() * 30;
+
+    enemies.push({
+
+      x: Math.cos(angle) * radius,
+
+      y: 0,
+
+      z: Math.sin(angle) * radius,
+
+      hp: 100,
+
+      maxHp: 100,
+
+      speed:
+        2 + Math.random() * 1.2,
+
+      attack: 0,
+
+      alive: true,
+
+      color:
+        i % 2 === 0
+          ? "#8d57db"
+          : "#d84c4c"
+
+    });
+
+  }
+
+}
+
+/* =========================================================
+   敵AI
+========================================================= */
+
+function updateEnemies(dt) {
+
+  for (const enemy of enemies) {
+
+    if (!enemy.alive) {
+      continue;
+    }
+
+    const dx =
+      player.x - enemy.x;
+
+    const dz =
+      player.z - enemy.z;
+
+    const distance =
+      Math.hypot(dx, dz);
+
+    if (distance < 38) {
+
+      if (distance > 0.001) {
+
+        enemy.x +=
+          (dx / distance) *
+          enemy.speed *
+          dt;
+
+        enemy.z +=
+          (dz / distance) *
+          enemy.speed *
+          dt;
+
+      }
+
+      enemy.attack -= dt;
+
+      if (
+        distance < 14 &&
+        enemy.attack <= 0
+      ) {
+
+        player.hp -= 8;
+
+        enemy.attack = 0.8;
+
+        hitEffect(
+          player.x,
+          player.z
+        );
+
+        updateHUD();
+
+        if (player.hp <= 0) {
+
+          endGame(false);
+
+          return;
+
+        }
+
+      }
+
+    }
+
+  }
+
+}
+
+/* =========================================================
+   アイテム生成
+========================================================= */
+
+function createItems(count) {
+
+  const types = [
+    "ammo",
+    "med",
+    "wood",
+    "shotgun",
+    "smg"
+  ];
+
+  for (let i = 0; i < count; i++) {
+
+    items.push({
+
+      x:
+        (Math.random() - 0.5) *
+        110,
+
+      z:
+        (Math.random() - 0.5) *
+        110,
+
+      type:
+        types[
+          Math.floor(
+            Math.random() *
+            types.length
+          )
+        ],
+
+      taken: false
+
+    });
+
+  }
+
+}
+
+/* =========================================================
+   アイテム拾う
+========================================================= */
+
+function pickup() {
+
+  let nearest = null;
+
+  let nearestDistance = 3;
+
+  for (const item of items) {
+
+    if (item.taken) {
+      continue;
+    }
+
+    const distance =
+      Math.hypot(
+        player.x - item.x,
+        player.z - item.z
+      );
+
+    if (
+      distance < nearestDistance
+    ) {
+
+      nearestDistance = distance;
+      nearest = item;
+
+    }
+
+  }
+
+  if (!nearest) {
+
+    showMessage(
+      "アイテムが近くにありません"
+    );
+
+    return;
+
+  }
+
+  nearest.taken = true;
+
+  if (nearest.type === "ammo") {
+
+    player.ammo += 30;
+
+    showMessage(
+      "🔸 弾薬 +30"
+    );
+
+  }
+
+  else if (nearest.type === "med") {
+
+    player.hp =
+      Math.min(
+        player.maxHp,
+        player.hp + 35
+      );
+
+    showMessage(
+      "💚 HP +35"
+    );
+
+  }
+
+  else if (nearest.type === "wood") {
+
+    player.materials += 20;
+
+    showMessage(
+      "🪵 木材 +20"
+    );
+
+  }
+
+  else if (nearest.type === "shotgun") {
+
+    player.weapon = 1;
+
+    showMessage(
+      "🔫 ショットガンを拾った！"
+    );
+
+  }
+
+  else if (nearest.type === "smg") {
+
+    player.weapon = 2;
+
+    showMessage(
+      "🔫 SMGを拾った！"
+    );
+
+  }
+
+  updateHUD();
+
+}
+
+/* =========================================================
+   武器
+========================================================= */
+
+function selectWeapon(index) {
+
+  if (
+    index < 0 ||
+    index >= weapons.length
+  ) {
+    return;
+  }
+
+  player.weapon = index;
+
+  document.getElementById(
+    "weaponName"
+  ).textContent =
+    weapons[index].name;
+
+}
+
+/* =========================================================
+   射撃
+========================================================= */
+
+let shootTimer = 0;
+
+function shoot() {
+
+  if (!playing || gameOver) {
+    return;
+  }
+
+  if (shootTimer > 0) {
+    return;
+  }
+
+  if (player.ammo <= 0) {
+
+    showMessage(
+      "弾切れ！ Eで弾薬を拾おう"
+    );
+
+    return;
+
+  }
+
+  const weapon =
+    weapons[player.weapon];
+
+  player.ammo--;
+
+  shootTimer =
+    weapon.rate;
+
+  let target = null;
+
+  let bestDistance = Infinity;
+
+  for (const enemy of enemies) {
+
+    if (!enemy.alive) {
+      continue;
+    }
+
+    const dx =
+      enemy.x - player.x;
+
+    const dz =
+      enemy.z - player.z;
+
+    const distance =
+      Math.hypot(dx, dz);
+
+    if (
+      distance >
+      weapon.range
+    ) {
+      continue;
+    }
+
+    const angle =
+      Math.atan2(dz, dx);
+
+    const difference =
+      normalizeAngle(
+        angle - player.yaw
+      );
+
+    let accuracy = 0.13;
+
+    if (player.weapon === 1) {
+      accuracy = 0.25;
+    }
+
+    if (
+      Math.abs(difference) <
+      accuracy
+    ) {
+
+      if (
+        distance <
+        bestDistance
+      ) {
+
+        bestDistance = distance;
+        target = enemy;
+
+      }
+
+    }
+
+  }
+
+  if (target) {
+
+    target.hp -= weapon.damage;
+
+    for (let i = 0; i < 8; i++) {
+
+      particles.push({
+
+        x:
+          target.x +
+          (Math.random() - 0.5),
+
+        y:
+          1 +
+          Math.random() * 2,
+
+        z:
+          target.z +
+          (Math.random() - 0.5),
+
+        life: 0.35
+
+      });
+
+    }
+
+    if (target.hp <= 0) {
+
+      target.alive = false;
+
+      player.kills++;
+
+      showMessage(
+        "💥 敵を撃破！"
+      );
+
+      updateAlive();
+
+      const remaining =
+        enemies.filter(
+          e => e.alive
+        ).length;
+
+      if (remaining === 0) {
+
+        endGame(true);
+
+      }
+
+    }
+
+  }
+
+  updateHUD();
+
+}
+
+function normalizeAngle(angle) {
+
+  while (angle > Math.PI) {
+    angle -= Math.PI * 2;
+  }
+
+  while (angle < -Math.PI) {
+    angle += Math.PI * 2;
+  }
+
+  return angle;
+}
+
+/* =========================================================
+   建築
+========================================================= */
+
+function buildWall() {
+
+  if (player.materials < 10) {
+
+    showMessage(
+      "🪵 木材が足りない！"
+    );
+
+    return;
+
+  }
+
+  const x =
+    player.x +
+    Math.cos(player.yaw) * 5;
+
+  const z =
+    player.z +
+    Math.sin(player.yaw) * 5;
+
+  builds.push({
+
+    x:
+      Math.round(x / 2) * 2,
+
+    z:
+      Math.round(z / 2) * 2,
+
+    w: 4,
+
+    d: 0.6,
+
+    h: 3
+
+  });
+
+  player.materials -= 10;
+
+  showMessage(
+    "🧱 壁を建築！"
+  );
+
+}
+
+/* =========================================================
+   プレイヤー移動
+========================================================= */
+
+function updatePlayer(dt) {
+
+  let moveX = 0;
+  let moveZ = 0;
+
+  if (keys["w"]) {
+    moveZ += 1;
+  }
+
+  if (keys["s"]) {
+    moveZ -= 1;
+  }
+
+  if (keys["a"]) {
+    moveX -= 1;
+  }
+
+  if (keys["d"]) {
+    moveX += 1;
+  }
+
+  const pad = getGamepad();
+
+  if (pad) {
+
+    const leftX =
+      deadzone(
+        pad.axes[0] || 0
+      );
+
+    const leftY =
+      deadzone(
+        pad.axes[1] || 0
+      );
+
+    moveX += leftX;
+    moveZ -= leftY;
+
+    const rightX =
+      deadzone(
+        pad.axes[2] || 0
+      );
+
+    const rightY =
+      deadzone(
+        pad.axes[3] || 0
+      );
+
+    player.yaw +=
+      rightX * 0.055;
+
+    player.pitch +=
+      rightY * 0.025;
+
+    player.pitch =
+      Math.max(
+        -0.4,
+        Math.min(
+          0.7,
+          player.pitch
+        )
+      );
+
+    /* Aボタン */
+    if (
+      pad.buttons[0] &&
+      pad.buttons[0].pressed
+    ) {
+
+      shoot();
+
+    }
+
+    /* Bボタン */
+    if (
+      pad.buttons[1] &&
+      pad.buttons[1].pressed
+    ) {
+
+      player.speed =
+        player.sprint;
+
+    }
+
+  }
+
+  const length =
+    Math.hypot(
+      moveX,
+      moveZ
+    );
+
+  if (length > 1) {
+
+    moveX /= length;
+    moveZ /= length;
+
+  }
+
+  let speed =
+    player.speed;
+
+  if (keys["shift"]) {
+    speed = player.sprint;
+  }
+
+  if (length > 0) {
+
+    const sin =
+      Math.sin(player.yaw);
+
+    const cos =
+      Math.cos(player.yaw);
+
+    player.x +=
+      (
+        moveX * cos +
+        moveZ * sin
+      ) *
+      speed *
+      dt;
+
+    player.z +=
+      (
+        moveZ * cos -
+        moveX * sin
+      ) *
+      speed *
+      dt;
+
+  }
+
+  /* マップ外に出ない */
+  player.x =
+    Math.max(
+      -62,
+      Math.min(
+        62,
+        player.x
+      )
+    );
+
+  player.z =
+    Math.max(
+      -62,
+      Math.min(
+        62,
+        player.z
+      )
+    );
+
+  /* マウスカメラ */
+  const sensitivity =
+    Number(
+      document.getElementById(
+        "sens"
+      ).value
+    );
+
+  player.yaw +=
+    mouseDX *
+    0.0025 *
+    (sensitivity / 8);
+
+  player.pitch +=
+    mouseDY *
+    0.0015;
+
+  player.pitch =
+    Math.max(
+      -0.4,
+      Math.min(
+        0.7,
+        player.pitch
+      )
+    );
+
+  mouseDX = 0;
+  mouseDY = 0;
+
+  shootTimer =
+    Math.max(
+      0,
+      shootTimer - dt
+    );
+
+  if (mouseDown) {
+    shoot();
+  }
+
+}
+
+/* =========================================================
+   3D → 2D 投影
+========================================================= */
+
+function project(x, y, z) {
+
+  const dx =
+    x - player.x;
+
+  const dz =
+    z - player.z;
+
+  const cameraCos =
+    Math.cos(
+      -player.yaw
+    );
+
+  const cameraSin =
+    Math.sin(
+      -player.yaw
+    );
+
+  const cameraX =
+    dx * cameraCos -
+    dz * cameraSin;
+
+  const cameraZ =
+    dx * cameraSin +
+    dz * cameraCos;
+
+  const pitchCos =
+    Math.cos(
+      -player.pitch
+    );
+
+  const pitchSin =
+    Math.sin(
+      -player.pitch
+    );
+
+  const cameraY =
+    y * pitchCos -
+    cameraZ * pitchSin;
+
+  const finalZ =
+    y * pitchSin +
+    cameraZ * pitchCos;
+
+  if (finalZ <= 0.1) {
+    return null;
+  }
+
+  const focal =
+    700 / finalZ;
+
+  return {
+
+    x:
+      W / 2 +
+      cameraX * focal,
+
+    y:
+      H * 0.53 -
+      cameraY * focal,
+
+    scale:
+      focal
+
+  };
+
+}
+
+/* =========================================================
+   ワールド描画
+========================================================= */
+
+function drawWorld() {
+
+  ctx.clearRect(
+    0,
+    0,
+    W,
+    H
+  );
+
+  /* 空 */
+
+  const sky =
+    ctx.createLinearGradient(
+      0,
+      0,
+      0,
+      H
+    );
+
+  sky.addColorStop(
+    0,
+    "#63b9ef"
+  );
+
+  sky.addColorStop(
+    0.55,
+    "#c0e9ff"
+  );
+
+  sky.addColorStop(
+    0.56,
+    "#76c94b"
+  );
+
+  sky.addColorStop(
+    1,
+    "#4b9636"
+  );
+
+  ctx.fillStyle = sky;
+
+  ctx.fillRect(
+    0,
+    0,
+    W,
+    H
+  );
+
+  /* 地面 */
+
+  drawGround();
+
+  /* 建物 */
+
+  for (
+    const obstacle
+    of map.obstacles
+  ) {
+
+    drawBox(
+      obstacle.x,
+      obstacle.w,
+      obstacle.h,
+      obstacle.z,
+      obstacle.d,
+      "#8d735b"
+    );
+
+  }
+
+  /* 建築 */
+
+  for (
+    const build
+    of builds
+  ) {
+
+    drawBox(
+      build.x,
+      build.w,
+      build.h,
+      build.z,
+      build.d,
+      "#b87538"
+    );
+
+  }
+
+  /* アイテム */
+
+  for (
+    const item
+    of items
+  ) {
+
+    if (item.taken) {
+      continue;
+    }
+
+    const p =
+      project(
+        item.x,
+        1,
+        item.z
+      );
+
+    if (!p) {
+      continue;
+    }
+
+    ctx.save();
+
+    let color = "#f4d34f";
+
+    if (item.type === "med") {
+      color = "#35dd72";
+    }
+
+    else if (
+      item.type === "wood"
+    ) {
+      color = "#9c6a3b";
+    }
+
+    else if (
+      item.type === "shotgun"
+    ) {
+      color = "#db4b4b";
+    }
+
+    else if (
+      item.type === "smg"
+    ) {
+      color = "#9c5be0";
+    }
+
+    ctx.fillStyle = color;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      p.x,
+      p.y,
+      Math.max(
+        4,
+        p.scale * 0.13
+      ),
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.restore();
+
+  }
+
+  /* 敵 */
+
+  for (
+    const enemy
+    of enemies
+  ) {
+
+    if (!enemy.alive) {
+      continue;
+    }
+
+    drawCharacter(
+      enemy.x,
+      enemy.y,
+      enemy.z,
+      enemy.color,
+      false,
+      enemy.hp
+    );
+
+  }
+
+  /* プレイヤー */
+
+  drawCharacter(
+    player.x,
+    player.y,
+    player.z,
+    "#3279e8",
+    true,
+    player.hp
+  );
+
+  /* パーティクル */
+
+  for (
+    const particle
+    of particles
+  ) {
+
+    const p =
+      project(
+        particle.x,
+        particle.y,
+        particle.z
+      );
+
+    if (!p) {
+      continue;
+    }
+
+    ctx.fillStyle = "#ffffff";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      p.x,
+      p.y,
+      4,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+  }
+
+}
+
+/* =========================================================
+   地面
+========================================================= */
+
+function drawGround() {
+
+  const gridSize = 10;
+
+  for (
+    let x = -60;
+    x <= 60;
+    x += gridSize
+  ) {
+
+    drawLine3D(
+      x,
+      0,
+      -60,
+      x,
+      0,
+      60,
+      "rgba(255,255,255,.12)"
+    );
+
+  }
+
+  for (
+    let z = -60;
+    z <= 60;
+    z += gridSize
+  ) {
+
+    drawLine3D(
+      -60,
+      0,
+      z,
+      60,
+      0,
+      z,
+      "rgba(255,255,255,.12)"
+    );
+
+  }
+
+}
+
+function drawLine3D(
+  x1,
+  y1,
+  z1,
+  x2,
+  y2,
+  z2,
+  color
+) {
+
+  const a =
+    project(
+      x1,
+      y1,
+      z1
+    );
+
+  const b =
+    project(
+      x2,
+      y2,
+      z2
+    );
+
+  if (!a || !b) {
+    return;
+  }
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    a.x,
+    a.y
+  );
+
+  ctx.lineTo(
+    b.x,
+    b.y
+  );
+
+  ctx.stroke();
+
+}
+
+/* =========================================================
+   3Dボックス
+========================================================= */
+
+function drawBox(
+  x,
+  width,
+  height,
+  z,
+  depth,
+  color
+) {
+
+  const points = [
+
+    project(
+      x - width / 2,
+      0,
+      z - depth / 2
+    ),
+
+    project(
+      x + width / 2,
+      0,
+      z - depth / 2
+    ),
+
+    project(
+      x + width / 2,
+      0,
+      z + depth / 2
+    ),
+
+    project(
+      x - width / 2,
+      0,
+      z + depth / 2
+    ),
+
+    project(
+      x - width / 2,
+      height,
+      z - depth / 2
+    ),
+
+    project(
+      x + width / 2,
+      height,
+      z - depth / 2
+    ),
+
+    project(
+      x + width / 2,
+      height,
+      z + depth / 2
+    ),
+
+    project(
+      x - width / 2,
+      height,
+      z + depth / 2
+    )
+
+  ];
+
+  if (
+    points.some(
+      point => point === null
+    )
+  ) {
+
+    return;
+
+  }
+
+  ctx.fillStyle = color;
+
+  polygon([
+    points[0],
+    points[1],
+    points[5],
+    points[4]
+  ]);
+
+  polygon([
+    points[1],
+    points[2],
+    points[6],
+    points[5]
+  ]);
+
+  polygon([
+    points[2],
+    points[3],
+    points[7],
+    points[6]
+  ]);
+
+  polygon([
+    points[3],
+    points[0],
+    points[4],
+    points[7]
+  ]);
+
+  polygon([
+    points[4],
+    points[5],
+    points[6],
+    points[7]
+  ]);
+
+}
+
+function polygon(points) {
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    points[0].x,
+    points[0].y
+  );
+
+  for (
+    let i = 1;
+    i < points.length;
+    i++
+  ) {
+
+    ctx.lineTo(
+      points[i].x,
+      points[i].y
+    );
+
+  }
+
+  ctx.closePath();
+
+  ctx.fill();
+
+  ctx.strokeStyle =
+    "rgba(0,0,0,.25)";
+
+  ctx.stroke();
+
+}
+
+/* =========================================================
+   キャラクター
+========================================================= */
+
+function drawCharacter(
+  x,
+  y,
+  z,
+  color,
+  isPlayer,
+  hp
+) {
+
+  const body =
+    project(
+      x,
+      y + 1,
+      z
+    );
+
+  const head =
+    project(
+      x,
+      y + 2.15,
+      z
+    );
+
+  const feet =
+    project(
+      x,
+      y,
+      z
+    );
+
+  if (
+    !body ||
+    !head ||
+    !feet
+  ) {
+
+    return;
+
+  }
+
+  const scale =
+    body.scale;
+
+  /* 影 */
+
+  ctx.fillStyle =
+    "rgba(0,0,0,.3)";
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    feet.x,
+    feet.y,
+    Math.max(
+      4,
+      scale * .18
+    ),
+    Math.max(
+      2,
+      scale * .07
+    ),
+    0,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  /* 足 */
+
+  ctx.strokeStyle = "#111";
+
+  ctx.lineWidth =
+    Math.max(
+      2,
+      scale * .035
+    );
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    body.x - scale * .07,
+    body.y
+  );
+
+  ctx.lineTo(
+    feet.x - scale * .08,
+    feet.y
+  );
+
+  ctx.moveTo(
+    body.x + scale * .07,
+    body.y
+  );
+
+  ctx.lineTo(
+    feet.x + scale * .08,
+    feet.y
+  );
+
+  ctx.stroke();
+
+  /* 体 */
+
+  ctx.fillStyle = color;
+
+  ctx.fillRect(
+    body.x - scale * .13,
+    body.y - scale * .22,
+    scale * .26,
+    scale * .44
+  );
+
+  /* 頭 */
+
+  ctx.fillStyle =
+    "#ffd1a5";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    head.x,
+    head.y,
+    Math.max(
+      5,
+      scale * .11
+    ),
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+  /* 敵HP */
+
+  if (!isPlayer) {
+
+    ctx.fillStyle =
+      "#222";
+
+    ctx.fillRect(
+      head.x - scale * .16,
+      head.y - scale * .2,
+      scale * .32,
+      4
+    );
+
+    ctx.fillStyle =
+      "#4ee46b";
+
+    ctx.fillRect(
+      head.x - scale * .16,
+      head.y - scale * .2,
+      scale *
+        .32 *
+        Math.max(
+          0,
+          hp / 100
+        ),
+      4
+    );
+
+  }
+
+}
+
+/* =========================================================
+   HUD
+========================================================= */
+
+function updateHUD() {
+
+  const hpPercent =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        player.hp /
+        player.maxHp *
+        100
+      )
+    );
+
+  document.getElementById(
+    "health"
+  ).style.width =
+    hpPercent + "%";
+
+  document.getElementById(
+    "hpText"
+  ).textContent =
+    Math.max(
+      0,
+      Math.ceil(player.hp)
+    ) +
+    " / " +
+    player.maxHp;
+
+  document.getElementById(
+    "ammo"
+  ).textContent =
+    player.ammo;
+
+  document.getElementById(
+    "weaponName"
+  ).textContent =
+    weapons[player.weapon].name;
+
+  updateAlive();
+
+}
+
+function updateAlive() {
+
+  const enemyCount =
+    enemies.filter(
+      enemy => enemy.alive
+    ).length;
+
+  document.getElementById(
+    "alive"
+  ).textContent =
+    enemyCount + 1;
+
+}
+
+/* =========================================================
+   メッセージ
+========================================================= */
+
+let messageTimer = 0;
+
+function showMessage(text) {
+
+  document.getElementById(
+    "message"
+  ).textContent =
+    text;
+
+  messageTimer = 2;
+
+}
+
+/* =========================================================
+   ゲーム終了
+========================================================= */
+
+function endGame(win) {
+
+  if (gameOver) {
+    return;
+  }
+
+  gameOver = true;
+  playing = false;
+
+  if (document.exitPointerLock) {
+    document.exitPointerLock();
+  }
+
+  document
+    .getElementById("hud")
+    .classList.add("hidden");
+
+  document
+    .getElementById("result")
+    .classList.remove("hidden");
+
+  document.getElementById(
+    "resultTitle"
+  ).textContent =
+    win
+      ? "🏆 VICTORY ROYALE!"
+      : "💀 GAME OVER";
+
+  document.getElementById(
+    "resultInfo"
+  ).textContent =
+    "撃破数：" +
+    player.kills +
+    "　｜　順位：" +
+    (win ? "1位" : "脱落");
+
+}
+
+/* =========================================================
+   ダメージエフェクト
+========================================================= */
+
+function hitEffect(
+  x,
+  z
+) {
+
+  for (
+    let i = 0;
+    i < 10;
+    i++
+  ) {
+
+    particles.push({
+
+      x:
+        x +
+        (Math.random() - .5),
+
+      y:
+        1 +
+        Math.random() * 2,
+
+      z:
+        z +
+        (Math.random() - .5),
+
+      life: .4
+
+    });
+
+  }
+
+}
+
+/* =========================================================
+   メイン更新
+========================================================= */
+
+function update(dt) {
+
+  if (!playing) {
+    return;
+  }
+
+  updatePlayer(dt);
+
+  updateEnemies(dt);
+
+  for (
+    const particle
+    of particles
+  ) {
+
+    particle.life -= dt;
+
+  }
+
+  particles =
+    particles.filter(
+      particle =>
+        particle.life > 0
+    );
+
+  if (messageTimer > 0) {
+
+    messageTimer -= dt;
+
+    if (messageTimer <= 0) {
+
+      document.getElementById(
+        "message"
+      ).textContent = "";
+
+    }
+
+  }
+
+  updateHUD();
+
+}
+
+/* =========================================================
+   メインループ
+========================================================= */
+
+function gameLoop(now) {
+
+  const dt =
+    Math.min(
+      0.033,
+      (now - lastTime) / 1000
+    );
+
+  lastTime = now;
+
+  update(dt);
+
+  if (playing) {
+    drawWorld();
+  }
+
+  requestAnimationFrame(
+    gameLoop
+  );
+
+}
+
+requestAnimationFrame(
+  gameLoop
+);
+
+</script>
+
+</body>
 </html>
