@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Battle Royale</title>
+<title>Battle Royale 3D</title>
 
 <style>
 *{
@@ -17,563 +17,206 @@ html,body{
   height:100%;
   overflow:hidden;
   font-family:Arial,"Noto Sans JP",sans-serif;
-  background:#08111d;
-  color:white;
+  background:#111;
 }
 
-button,input,textarea,select{
-  font:inherit;
+#game{
+  position:fixed;
+  inset:0;
 }
 
-button{
-  cursor:pointer;
-  border:0;
+canvas{
+  display:block;
 }
 
 .hidden{
   display:none!important;
 }
 
-/* ================= LOGIN ================= */
+/* =========================
+   ロビー
+========================= */
 
-#loginScreen{
+#lobby{
   position:fixed;
   inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  z-index:20;
+  color:white;
   background:
-    radial-gradient(circle at 50% 30%,#2c9bea,#101c39 55%,#050910);
-  z-index:10000;
-}
-
-.loginBox{
-  width:min(430px,90vw);
-  padding:40px;
-  border-radius:24px;
-  background:rgba(8,17,30,.92);
-  box-shadow:0 25px 80px #000;
-  border:1px solid rgba(255,255,255,.15);
-  text-align:center;
+    linear-gradient(
+      rgba(5,15,30,.35),
+      rgba(5,15,30,.65)
+    );
 }
 
 .logo{
-  font-size:42px;
-  font-weight:900;
-  letter-spacing:2px;
-  text-shadow:0 5px 20px #000;
-}
-
-.logo span{
-  color:#41a7ff;
-}
-
-.subtitle{
-  opacity:.7;
-  margin:10px 0 30px;
-}
-
-.field{
-  width:100%;
-  padding:14px;
-  margin:8px 0;
-  border-radius:10px;
-  border:1px solid #41506a;
-  background:#111d2d;
-  color:white;
-  outline:none;
-}
-
-.bigButton{
-  width:100%;
-  padding:16px;
-  margin-top:15px;
-  border-radius:12px;
-  color:white;
-  background:linear-gradient(135deg,#238cff,#5b42ff);
-  font-weight:bold;
-  font-size:18px;
-  box-shadow:0 8px 25px #0006;
-}
-
-.bigButton:hover{
-  transform:translateY(-2px);
-  filter:brightness(1.15);
-}
-
-.loginInfo{
-  margin-top:18px;
-  font-size:12px;
-  opacity:.6;
-}
-
-/* ================= APP ================= */
-
-#app{
-  position:fixed;
-  inset:0;
-}
-
-/* ================= NAV ================= */
-
-.topbar{
   position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:70px;
-  z-index:100;
-  display:flex;
-  align-items:center;
-  padding:0 24px;
-  background:linear-gradient(#06101de8,transparent);
-}
-
-.topLogo{
-  font-size:25px;
-  font-weight:900;
-  margin-right:30px;
-}
-
-.nav{
-  display:flex;
-  gap:8px;
-}
-
-.nav button{
-  padding:10px 15px;
-  border-radius:9px;
-  background:#ffffff14;
-  color:white;
-}
-
-.nav button:hover,
-.nav button.active{
-  background:#318fff;
-}
-
-.userArea{
-  margin-left:auto;
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-
-.userBadge{
-  padding:9px 13px;
-  background:#111c2dcc;
-  border-radius:10px;
-}
-
-.logout{
-  background:#e43e50!important;
-}
-
-/* ================= SCREENS ================= */
-
-.screen{
-  position:absolute;
-  inset:0;
-  padding-top:70px;
-  overflow:auto;
-}
-
-/* ================= LOBBY ================= */
-
-#lobbyScreen{
-  background:
-    linear-gradient(#51b8ef 0%,#9ce4ff 47%,#5dbd42 48%,#2d7d2c 100%);
-}
-
-.lobbyWorld{
-  position:absolute;
-  inset:70px 0 0;
-  overflow:hidden;
-  perspective:800px;
-}
-
-.mountain{
-  position:absolute;
-  bottom:45%;
-  width:0;
-  height:0;
-  border-left:170px solid transparent;
-  border-right:170px solid transparent;
-  border-bottom:260px solid #236c4a;
-}
-
-.m1{left:5%}
-.m2{left:28%;transform:scale(1.5)}
-.m3{right:5%;transform:scale(1.2)}
-
-.ground{
-  position:absolute;
-  left:-10%;
-  width:120%;
-  bottom:-35%;
-  height:70%;
-  background:
-    repeating-linear-gradient(90deg,#3f923a 0 90px,#438f3d 90px 180px);
-  transform:rotateX(55deg);
-  transform-origin:bottom;
-}
-
-.lobbyHouse{
-  position:absolute;
-  bottom:37%;
-  width:180px;
-  height:120px;
-  background:#925d38;
-  box-shadow:0 15px 30px #0005;
-}
-
-.lobbyHouse:before{
-  content:"";
-  position:absolute;
-  left:-20px;
-  top:-55px;
-  width:0;
-  height:0;
-  border-left:110px solid transparent;
-  border-right:110px solid transparent;
-  border-bottom:70px solid #533322;
-}
-
-.house1{left:18%}
-.house2{right:18%}
-
-.lobbyCharacter{
-  position:absolute;
-  bottom:31%;
-  left:50%;
-  width:70px;
-  height:150px;
-  transform:translateX(-50%);
-  z-index:5;
-  filter:drop-shadow(0 15px 8px #0007);
-}
-
-.body{
-  position:absolute;
-  bottom:0;
-  left:10px;
-  width:50px;
-  height:100px;
-  border-radius:25px 25px 15px 15px;
-  background:linear-gradient(90deg,#174fd1,#2578ff);
-}
-
-.head{
-  position:absolute;
-  top:0;
-  left:10px;
-  width:50px;
-  height:55px;
-  border-radius:50%;
-  background:#ffc28d;
-}
-
-.lobbyPanel{
-  position:absolute;
-  z-index:10;
   left:30px;
-  bottom:30px;
-  width:330px;
-}
-
-.playButton{
-  width:100%;
-  padding:22px;
-  border-radius:15px;
-  font-size:30px;
-  font-weight:900;
-  color:white;
-  background:linear-gradient(135deg,#ffbd28,#ff5d18);
-  box-shadow:0 12px 30px #0008;
-}
-
-.lobbyTitle{
+  top:22px;
   font-size:38px;
-  font-weight:900;
-  margin-bottom:10px;
+  font-weight:1000;
+  letter-spacing:2px;
   text-shadow:0 4px 10px #000;
 }
 
-/* ================= PANELS ================= */
-
-.panelPage{
-  min-height:100%;
-  padding:35px;
-  background:
-    radial-gradient(circle at 80% 20%,#183c67,#08111d 60%);
-}
-
-.pageTitle{
-  font-size:36px;
-  font-weight:900;
-  margin-bottom:25px;
-}
-
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:18px;
-}
-
-.card{
-  padding:22px;
-  border-radius:16px;
-  background:#101e31e8;
-  border:1px solid #ffffff15;
-  box-shadow:0 12px 30px #0005;
-}
-
-.card h3{
-  margin-top:0;
-}
-
-.shopItem{
-  min-height:240px;
-  position:relative;
+.topMenu{
+  position:absolute;
+  top:25px;
+  left:50%;
+  transform:translateX(-50%);
   display:flex;
-  flex-direction:column;
+  gap:10px;
 }
 
-.itemVisual{
-  height:130px;
+.menuBtn{
+  border:0;
+  color:white;
+  background:rgba(15,25,40,.82);
+  padding:14px 24px;
   border-radius:12px;
-  background:
-    radial-gradient(circle,#56a9ff,#142a48);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:65px;
-  margin-bottom:15px;
-}
-
-.price{
-  margin-top:auto;
+  font-size:17px;
   font-weight:bold;
-  color:#ffd44a;
+  cursor:pointer;
+  box-shadow:0 5px 18px #0007;
 }
 
-.actionButton{
-  padding:10px 15px;
-  border-radius:9px;
-  background:#318fff;
-  color:white;
-  margin-top:10px;
+.menuBtn:hover{
+  background:#2563eb;
+  transform:translateY(-2px);
 }
 
-.actionButton.red{
-  background:#df4154;
-}
-
-.actionButton.green{
-  background:#29ad70;
-}
-
-/* ================= NEWS ================= */
-
-.newsCard{
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-}
-
-.newsThumb{
-  width:280px;
-  height:150px;
-  background:#182b43;
+.profile{
+  position:absolute;
+  right:25px;
+  top:25px;
+  background:#101c2cdd;
+  padding:12px 18px;
   border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:50px;
 }
 
-/* ================= ADMIN ================= */
-
-.adminLayout{
-  display:grid;
-  grid-template-columns:230px 1fr;
-  min-height:100%;
+.playArea{
+  position:absolute;
+  left:55px;
+  bottom:55px;
 }
 
-.adminSide{
-  background:#070f1b;
-  border-right:1px solid #ffffff15;
-  padding:20px;
-}
-
-.adminSide h2{
-  margin-top:5px;
-}
-
-.adminSide button{
-  width:100%;
-  text-align:left;
-  padding:13px;
-  margin:4px 0;
-  border-radius:8px;
-  background:transparent;
-  color:white;
-}
-
-.adminSide button:hover,
-.adminSide button.active{
-  background:#286fd3;
-}
-
-.adminMain{
-  padding:35px;
-  overflow:auto;
-  background:#0b1524;
-}
-
-.statGrid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
-}
-
-.stat{
-  padding:20px;
-  background:#13243a;
+.playBtn{
+  border:0;
+  padding:22px 75px;
   border-radius:14px;
-}
-
-.stat strong{
-  display:block;
   font-size:32px;
-  margin-top:8px;
+  font-weight:1000;
+  color:white;
+  background:linear-gradient(135deg,#1683ff,#703cff);
+  cursor:pointer;
+  box-shadow:0 8px 25px #0009;
 }
 
-.adminTable{
-  width:100%;
-  border-collapse:collapse;
-  background:#101d2e;
-  border-radius:12px;
-  overflow:hidden;
+.playBtn:hover{
+  transform:scale(1.04);
 }
 
-.adminTable th,
-.adminTable td{
-  padding:13px;
-  text-align:left;
-  border-bottom:1px solid #ffffff12;
+.subtitle{
+  margin-top:12px;
+  font-size:14px;
+  opacity:.85;
 }
 
-.adminTable th{
-  background:#162b44;
-}
+/* =========================
+   HUD
+========================= */
 
-.formBox{
-  max-width:700px;
-  padding:25px;
-  background:#101d2e;
-  border-radius:15px;
-}
-
-.formBox label{
-  display:block;
-  margin-top:15px;
-  margin-bottom:6px;
-}
-
-.formBox input,
-.formBox textarea,
-.formBox select{
-  width:100%;
-  padding:12px;
-  border-radius:8px;
-  border:1px solid #40516a;
-  background:#08111d;
+#hud{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:10;
   color:white;
 }
 
-.formBox textarea{
-  min-height:120px;
-  resize:vertical;
-}
-
-/* ================= GAME ================= */
-
-#gameScreen{
-  background:#62bde9;
-}
-
-#gameCanvas{
+.hpBox{
   position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-}
-
-.hud{
-  position:absolute;
-  z-index:20;
-  pointer-events:none;
-}
-
-.hpHud{
-  left:20px;
   top:20px;
+  left:20px;
   width:360px;
-  padding:15px;
+  padding:16px 20px;
   border-radius:16px;
-  background:#071525dd;
-  box-shadow:0 8px 25px #0007;
+  background:#071727dd;
+  box-shadow:0 7px 25px #0008;
 }
 
 .hpText{
-  font-size:22px;
+  font-size:21px;
   font-weight:bold;
+  margin-bottom:8px;
 }
 
-.hpBar{
-  margin-top:8px;
-  height:22px;
-  background:#111;
+.hpOuter{
+  height:25px;
   border:2px solid white;
-  border-radius:10px;
+  border-radius:20px;
   overflow:hidden;
+  background:#111;
 }
 
-.hpFill{
-  width:100%;
+#hpBar{
   height:100%;
-  background:#35d36d;
+  width:100%;
+  background:linear-gradient(90deg,#16d66b,#32e57a);
+  transition:.2s;
 }
 
-.playersHud{
-  right:20px;
-  top:20px;
-  padding:15px 20px;
-  background:#071525dd;
-  border-radius:15px;
-  font-size:22px;
-}
-
-.stormHud{
+.status{
+  position:absolute;
   top:20px;
   left:50%;
   transform:translateX(-50%);
-  padding:12px 20px;
-  background:#38206cdd;
-  border-radius:12px;
+  padding:14px 25px;
+  border-radius:14px;
+  background:#24125edc;
+  font-size:18px;
+  font-weight:bold;
+}
+
+.players{
+  position:absolute;
+  right:20px;
+  top:20px;
+  padding:16px 25px;
+  border-radius:16px;
+  background:#071727dd;
   font-size:20px;
+  font-weight:bold;
+}
+
+.weapon{
+  position:absolute;
+  right:20px;
+  bottom:20px;
+  width:210px;
+  padding:18px;
+  text-align:center;
+  border-radius:16px;
+  background:#071727ee;
+}
+
+.weaponName{
+  font-size:25px;
+  font-weight:bold;
+}
+
+.ammo{
+  font-size:25px;
+  margin-top:5px;
 }
 
 .crosshair{
   position:absolute;
   left:50%;
   top:50%;
+  transform:translate(-50%,-50%);
   width:30px;
   height:30px;
-  transform:translate(-50%,-50%);
-  z-index:21;
-  pointer-events:none;
 }
 
 .crosshair:before,
@@ -581,7 +224,7 @@ button{
   content:"";
   position:absolute;
   background:white;
-  box-shadow:0 0 4px black;
+  box-shadow:0 1px 3px #000;
 }
 
 .crosshair:before{
@@ -596,2614 +239,1344 @@ button{
   left:14px;
 }
 
-.weaponHud{
-  position:absolute;
-  right:20px;
-  bottom:20px;
-  padding:18px 25px;
-  background:#071525ee;
-  border-radius:15px;
-  font-size:20px;
-}
-
-.weaponName{
-  font-size:25px;
-  font-weight:bold;
-}
-
-.ammo{
-  font-size:30px;
-}
-
 .controls{
   position:absolute;
   left:20px;
   bottom:20px;
   padding:15px;
-  background:#071525dd;
   border-radius:12px;
+  background:#071727dd;
   line-height:1.7;
-  font-size:13px;
+  font-size:14px;
 }
 
-.buildHud{
-  position:absolute;
+/* =========================
+   パネル
+========================= */
+
+.panel{
+  position:fixed;
+  z-index:50;
   left:50%;
-  bottom:30px;
-  transform:translateX(-50%);
-  padding:10px 20px;
-  background:#d89b38dd;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(800px,90vw);
+  max-height:85vh;
+  overflow:auto;
+  padding:30px;
+  color:white;
+  border-radius:20px;
+  background:#071321f5;
+  box-shadow:0 20px 80px #000c;
+}
+
+.panel h1{
+  margin-top:0;
+}
+
+.close{
+  float:right;
+  border:0;
   border-radius:10px;
-  display:none;
+  background:#ef4444;
+  color:white;
+  padding:9px 15px;
+  cursor:pointer;
+  font-weight:bold;
 }
 
-#resultOverlay{
-  position:absolute;
-  inset:0;
-  z-index:100;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#0009;
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
 }
 
-.resultBox{
+.card{
+  background:#142238;
+  border-radius:14px;
+  padding:20px;
   text-align:center;
-  padding:45px;
-  width:min(500px,90vw);
-  border-radius:25px;
-  background:#0c1b2ddd;
-  box-shadow:0 20px 80px #000;
 }
 
-.resultBox h1{
-  font-size:55px;
-  margin:0;
+.card button{
+  border:0;
+  padding:10px 18px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
 }
 
-/* ================= RESPONSIVE ================= */
+.news{
+  background:#142238;
+  padding:18px;
+  border-radius:12px;
+  margin:10px 0;
+}
 
-@media(max-width:800px){
-  .nav{
-    display:none;
-  }
+/* =========================
+   ログイン
+========================= */
 
-  .topbar{
-    padding:0 12px;
-  }
+#loginPanel input{
+  width:100%;
+  padding:13px;
+  margin:8px 0;
+  border:0;
+  border-radius:8px;
+}
 
-  .panelPage,
-  .adminMain{
-    padding:20px;
-  }
+.primary{
+  background:#2563eb;
+  color:white;
+  border:0;
+  padding:12px 20px;
+  border-radius:9px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-  .adminLayout{
-    grid-template-columns:1fr;
-  }
+/* =========================
+   結果
+========================= */
 
-  .adminSide{
-    display:flex;
-    overflow:auto;
-    gap:5px;
-  }
+.resultTitle{
+  text-align:center;
+  font-size:50px;
+  font-weight:1000;
+}
 
-  .adminSide button{
-    min-width:130px;
-  }
-
-  .hpHud{
-    width:250px;
-  }
-
-  .controls{
-    font-size:10px;
-  }
+.resultRank{
+  text-align:center;
+  font-size:80px;
+  color:#ffd43b;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ========================================================= -->
-<!-- LOGIN -->
-<!-- ========================================================= -->
+<div id="game"></div>
 
-<div id="loginScreen">
+<!-- =========================
+     ロビーUI
+========================= -->
 
-  <div class="loginBox">
+<div id="lobby">
 
-    <div class="logo">
-      BATTLE <span>ROYALE</span>
-    </div>
+  <div class="logo">
+    BATTLE ROYALE
+  </div>
 
-    <div class="subtitle">
-      CHAPTER 1 · SEASON 1
-    </div>
+  <div class="topMenu">
 
-    <input
-      id="loginName"
-      class="field"
-      placeholder="ユーザー名"
-      autocomplete="off"
-    >
-
-    <input
-      id="loginPassword"
-      class="field"
-      type="password"
-      placeholder="パスワード"
-    >
-
-    <button
-      class="bigButton"
-      onclick="login()"
-    >
-      LOGIN
+    <button class="menuBtn" onclick="showLobby()">
+      🏠 ロビー
     </button>
 
-    <div class="loginInfo">
-      プレイヤー：任意の名前<br>
-      管理者デモ：admin / admin123
+    <button class="menuBtn" onclick="openShop()">
+      🛒 ショップ
+    </button>
+
+    <button class="menuBtn" onclick="openLocker()">
+      🎒 ロッカー
+    </button>
+
+    <button class="menuBtn" onclick="openNews()">
+      📰 ニュース
+    </button>
+
+    <button class="menuBtn" onclick="openAdmin()">
+      ⚙️ 管理
+    </button>
+
+  </div>
+
+  <div class="profile">
+    👤 Mario
+    <button
+      onclick="logout()"
+      style="
+      margin-left:10px;
+      border:0;
+      padding:7px 10px;
+      background:#ef4444;
+      color:white;
+      border-radius:7px;">
+      ログアウト
+    </button>
+  </div>
+
+  <div class="playArea">
+
+    <button class="playBtn" onclick="startGame()">
+      ▶ PLAY
+    </button>
+
+    <div class="subtitle">
+      ソロ・バトルロイヤル
     </div>
 
   </div>
 
 </div>
 
+<!-- =========================
+     HUD
+========================= -->
 
-<!-- ========================================================= -->
-<!-- APP -->
-<!-- ========================================================= -->
+<div id="hud" class="hidden">
 
-<div id="app" class="hidden">
+  <div class="hpBox">
 
-  <!-- TOP BAR -->
-
-  <div class="topbar">
-
-    <div class="topLogo">
-      BATTLE ROYALE
+    <div class="hpText">
+      ❤️ HP <span id="hpText">100</span> / 100
     </div>
 
-    <div class="nav" id="playerNav">
-
-      <button onclick="showScreen('lobby')">
-        🏠 ロビー
-      </button>
-
-      <button onclick="showScreen('shop')">
-        🛒 ショップ
-      </button>
-
-      <button onclick="showScreen('locker')">
-        🎒 ロッカー
-      </button>
-
-      <button onclick="showScreen('news')">
-        📰 ニュース
-      </button>
-
-      <button onclick="showScreen('stats')">
-        🏆 戦績
-      </button>
-
-    </div>
-
-    <div class="userArea">
-
-      <div class="userBadge" id="userNameDisplay">
-        PLAYER
-      </div>
-
-      <button
-        class="logout"
-        onclick="logout()"
-      >
-        ログアウト
-      </button>
-
+    <div class="hpOuter">
+      <div id="hpBar"></div>
     </div>
 
   </div>
 
+  <div class="status">
+    🌀 ストームまで <span id="stormTime">90</span>秒
+  </div>
 
-  <!-- ===================================================== -->
-  <!-- LOBBY -->
-  <!-- ===================================================== -->
+  <div class="players">
+    👥 残り <span id="remaining">10</span>
+  </div>
 
-  <section
-    id="lobbyScreen"
-    class="screen hidden"
-  >
+  <div class="crosshair"></div>
 
-    <div class="lobbyWorld">
+  <div class="weapon">
 
-      <div class="mountain m1"></div>
-      <div class="mountain m2"></div>
-      <div class="mountain m3"></div>
-
-      <div class="lobbyHouse house1"></div>
-      <div class="lobbyHouse house2"></div>
-
-      <div class="ground"></div>
-
-      <div class="lobbyCharacter">
-
-        <div class="head"></div>
-        <div class="body"></div>
-
-      </div>
-
-      <div class="lobbyPanel">
-
-        <div class="lobbyTitle">
-          BATTLE ROYALE
-        </div>
-
-        <button
-          class="playButton"
-          onclick="startGame()"
-        >
-          ▶ PLAY
-        </button>
-
-      </div>
-
+    <div class="weaponName" id="weaponName">
+      🔫 RIFLE
     </div>
 
-  </section>
-
-
-  <!-- ===================================================== -->
-  <!-- SHOP -->
-  <!-- ===================================================== -->
-
-  <section
-    id="shopScreen"
-    class="screen hidden"
-  >
-
-    <div class="panelPage">
-
-      <div class="pageTitle">
-        🛒 ショップ
-      </div>
-
-      <div class="cards">
-
-        <div class="card shopItem">
-
-          <div class="itemVisual">
-            🧍
-          </div>
-
-          <h3>ブルーウォリアー</h3>
-
-          <div>
-            スキン
-          </div>
-
-          <div class="price">
-            🪙 800
-          </div>
-
-          <button
-            class="actionButton"
-            onclick="buyItem('ブルーウォリアー',800)"
-          >
-            購入
-          </button>
-
-        </div>
-
-
-        <div class="card shopItem">
-
-          <div class="itemVisual">
-            🪓
-          </div>
-
-          <h3>ストームアックス</h3>
-
-          <div>
-            ツルハシ
-          </div>
-
-          <div class="price">
-            🪙 500
-          </div>
-
-          <button
-            class="actionButton"
-            onclick="buyItem('ストームアックス',500)"
-          >
-            購入
-          </button>
-
-        </div>
-
-
-        <div class="card shopItem">
-
-          <div class="itemVisual">
-            💃
-          </div>
-
-          <h3>ダンスエモート</h3>
-
-          <div>
-            エモート
-          </div>
-
-          <div class="price">
-            🪙 300
-          </div>
-
-          <button
-            class="actionButton"
-            onclick="buyItem('ダンスエモート',300)"
-          >
-            購入
-          </button>
-
-        </div>
-
-
-        <div class="card shopItem">
-
-          <div class="itemVisual">
-            🎒
-          </div>
-
-          <h3>タクティカルバッグ</h3>
-
-          <div>
-            バックアクセサリー
-          </div>
-
-          <div class="price">
-            🪙 650
-          </div>
-
-          <button
-            class="actionButton"
-            onclick="buyItem('タクティカルバッグ',650)"
-          >
-            購入
-          </button>
-
-        </div>
-
-      </div>
-
+    <div class="ammo">
+      <span id="ammo">30</span> /
+      <span id="reserve">120</span>
     </div>
 
-  </section>
-
-
-  <!-- ===================================================== -->
-  <!-- LOCKER -->
-  <!-- ===================================================== -->
-
-  <section
-    id="lockerScreen"
-    class="screen hidden"
-  >
-
-    <div class="panelPage">
-
-      <div class="pageTitle">
-        🎒 ロッカー
-      </div>
-
-      <div class="cards">
-
-        <div class="card">
-          <h3>スキン</h3>
-          <p id="skinText">初期スキン</p>
-        </div>
-
-        <div class="card">
-          <h3>バックアクセサリー</h3>
-          <p>なし</p>
-        </div>
-
-        <div class="card">
-          <h3>ツルハシ</h3>
-          <p>標準ツルハシ</p>
-        </div>
-
-        <div class="card">
-          <h3>エモート</h3>
-          <p>ダンス</p>
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ===================================================== -->
-  <!-- NEWS -->
-  <!-- ===================================================== -->
-
-  <section
-    id="newsScreen"
-    class="screen hidden"
-  >
-
-    <div class="panelPage">
-
-      <div class="pageTitle">
-        📰 ニュース
-      </div>
-
-      <div id="newsList"></div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ===================================================== -->
-  <!-- STATS -->
-  <!-- ===================================================== -->
-
-  <section
-    id="statsScreen"
-    class="screen hidden"
-  >
-
-    <div class="panelPage">
-
-      <div class="pageTitle">
-        🏆 戦績
-      </div>
-
-      <div class="cards">
-
-        <div class="card">
-          <h3>レベル</h3>
-          <div id="statLevel">1</div>
-        </div>
-
-        <div class="card">
-          <h3>勝利</h3>
-          <div id="statWins">0</div>
-        </div>
-
-        <div class="card">
-          <h3>撃破</h3>
-          <div id="statKills">0</div>
-        </div>
-
-        <div class="card">
-          <h3>コイン</h3>
-          <div id="statCoins">1500</div>
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ===================================================== -->
-  <!-- GAME -->
-  <!-- ===================================================== -->
-
-  <section
-    id="gameScreen"
-    class="screen hidden"
-  >
-
-    <canvas id="gameCanvas"></canvas>
-
-    <div class="hud hpHud">
-
-      <div class="hpText">
-        ❤️ HP <span id="hpText">100 / 100</span>
-      </div>
-
-      <div class="hpBar">
-        <div
-          class="hpFill"
-          id="hpFill"
-        ></div>
-      </div>
-
-    </div>
-
-
-    <div class="hud playersHud">
-      👥 残り <span id="remaining">10</span>
-    </div>
-
-
-    <div class="hud stormHud">
-      🌀 ストームまで
-      <span id="stormTimer">90</span>秒
-    </div>
-
-
-    <div class="crosshair"></div>
-
-
-    <div class="weaponHud">
-
-      <div class="weaponName" id="weaponName">
-        🔫 RIFLE
-      </div>
-
-      <div class="ammo">
-        <span id="ammo">30</span> /
-        <span id="reserve">120</span>
-      </div>
-
-    </div>
-
-
-    <div class="controls">
-
-      WASD：移動<br>
-      SHIFT：ダッシュ<br>
-      SPACE：ジャンプ<br>
-      左クリック：射撃<br>
-      R：リロード<br>
-      1：ライフル<br>
-      2：ショットガン<br>
-      B：建築<br>
-      E：アイテム取得<br>
-      ESC：ロビー<br>
-      🎮 右スティック：カメラ
-
-    </div>
-
-
-    <div
-      id="buildHud"
-      class="buildHud"
-    >
-      🧱 建築モード　
-      1 壁　2 床　3 階段　
-      B：解除
-    </div>
-
-
-    <div
-      id="resultOverlay"
-      class="hidden"
-    >
-
-      <div class="resultBox">
-
-        <h1 id="resultTitle">
-          VICTORY ROYALE!
-        </h1>
-
-        <p id="resultText">
-          あなたが最後まで生き残りました！
-        </p>
-
-        <button
-          class="bigButton"
-          onclick="backToLobby()"
-        >
-          🔄 ロビーへ戻る
-        </button>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ===================================================== -->
-  <!-- ADMIN -->
-  <!-- ===================================================== -->
-
-  <section
-    id="adminScreen"
-    class="screen hidden"
-  >
-
-    <div class="adminLayout">
-
-      <aside class="adminSide">
-
-        <h2>🛠 ADMIN</h2>
-
-        <button onclick="adminPage('dashboard')">
-          📊 ダッシュボード
-        </button>
-
-        <button onclick="adminPage('players')">
-          👥 プレイヤー管理
-        </button>
-
-        <button onclick="adminPage('chapter')">
-          🌎 チャプター
-        </button>
-
-        <button onclick="adminPage('season')">
-          🏆 シーズン
-        </button>
-
-        <button onclick="adminPage('news')">
-          📰 ニュース投稿
-        </button>
-
-        <button onclick="adminPage('shop')">
-          🛒 ショップ管理
-        </button>
-
-        <button onclick="logout()">
-          🚪 ログアウト
-        </button>
-
-      </aside>
-
-
-      <main
-        class="adminMain"
-        id="adminContent"
-      ></main>
-
-    </div>
-
-  </section>
+  </div>
+
+  <div class="controls">
+
+    <b>操作</b><br>
+    WASD：移動<br>
+    SHIFT：ダッシュ<br>
+    SPACE：ジャンプ<br>
+    左クリック：射撃<br>
+    R：リロード<br>
+    1：ライフル<br>
+    2：ショットガン<br>
+    B：建築<br>
+    E：アイテム取得<br>
+    ESC：ロビー<br>
+    🎮 右スティック：カメラ
+
+  </div>
 
 </div>
 
+<!-- =========================
+     SHOP
+========================= -->
+
+<div id="shopPanel" class="panel hidden">
+
+  <button class="close" onclick="closePanels()">閉じる</button>
+
+  <h1>🛒 アイテムショップ</h1>
+
+  <div class="cards">
+
+    <div class="card">
+      <h2>🔫 GOLD RIFLE</h2>
+      <p>強力なライフル</p>
+      <button onclick="buy('GOLD RIFLE')">
+        800 🪙
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>⚔️ ENERGY</h2>
+      <p>エネルギー武器</p>
+      <button onclick="buy('ENERGY')">
+        1200 🪙
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>🕺 ダンス</h2>
+      <p>エモート</p>
+      <button onclick="buy('DANCE')">
+        500 🪙
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     LOCKER
+========================= -->
+
+<div id="lockerPanel" class="panel hidden">
+
+  <button class="close" onclick="closePanels()">閉じる</button>
+
+  <h1>🎒 ロッカー</h1>
+
+  <div class="cards">
+
+    <div class="card">
+      <h2>👕 BLUE HERO</h2>
+      <button onclick="selectSkin('BLUE HERO')">
+        装備
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>🟥 RED HERO</h2>
+      <button onclick="selectSkin('RED HERO')">
+        装備
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>🟩 GREEN HERO</h2>
+      <button onclick="selectSkin('GREEN HERO')">
+        装備
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     NEWS
+========================= -->
+
+<div id="newsPanel" class="panel hidden">
+
+  <button class="close" onclick="closePanels()">閉じる</button>
+
+  <h1>📰 ニュース</h1>
+
+  <div class="news">
+    <h2>🌪️ シーズン1 開幕！</h2>
+    <p>
+      新しい島と武器が追加されました。
+    </p>
+  </div>
+
+  <div class="news">
+    <h2>🏗️ 建築アップデート</h2>
+    <p>
+      壁・床・階段を建築できます。
+    </p>
+  </div>
+
+</div>
+
+<!-- =========================
+     LOGIN
+========================= -->
+
+<div id="loginPanel" class="panel hidden">
+
+  <button class="close" onclick="closePanels()">閉じる</button>
+
+  <h1>🔐 管理者ログイン</h1>
+
+  <input
+    id="adminUser"
+    placeholder="ユーザー名">
+
+  <input
+    id="adminPass"
+    type="password"
+    placeholder="パスワード">
+
+  <button
+    class="primary"
+    onclick="adminLogin()">
+    ログイン
+  </button>
+
+  <p>
+    ※これはローカル版の簡易管理画面です。
+  </p>
+
+</div>
+
+<!-- =========================
+     ADMIN
+========================= -->
+
+<div id="adminPanel" class="panel hidden">
+
+  <button class="close" onclick="closePanels()">閉じる</button>
+
+  <h1>⚙️ 管理画面</h1>
+
+  <div class="cards">
+
+    <div class="card">
+      <h2>👥 プレイヤー管理</h2>
+      <p>プレイヤー数：1</p>
+      <button onclick="alert('プレイヤー一覧を表示')">
+        管理
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>📖 チャプター</h2>
+      <p>Chapter 1</p>
+      <button onclick="alert('チャプター設定')">
+        設定
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>🏆 シーズン</h2>
+      <p>Season 1</p>
+      <button onclick="alert('シーズン設定')">
+        設定
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>🎬 ニュース投稿</h2>
+      <button onclick="postNews()">
+        投稿
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     RESULT
+========================= -->
+
+<div id="resultPanel" class="panel hidden">
+
+  <div class="resultTitle">
+    MATCH RESULT
+  </div>
+
+  <div class="resultRank">
+    #1
+  </div>
+
+  <p style="text-align:center;font-size:22px">
+    🏆 Victory Royale!
+  </p>
+
+  <div style="text-align:center;margin-top:30px">
+
+    <button
+      class="primary"
+      onclick="returnLobby()">
+      🏠 ロビーへ戻る
+    </button>
+
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
 
 <script>
 
-/* ============================================================
-   DATABASE
-============================================================ */
+/* =====================================================
+   基本
+===================================================== */
 
-const DB_KEY = "battleRoyaleLocalDB";
+let scene;
+let camera;
+let renderer;
+let clock;
 
-let db = JSON.parse(
-  localStorage.getItem(DB_KEY) || "null"
-);
+let player;
+let playerBody;
+let playerHead;
 
-if(!db){
+let running=false;
 
-  db = {
+let keys={};
 
-    players: [],
+let yaw=0;
+let pitch=-0.25;
 
-    chapter: "Chapter 1",
+let velocityY=0;
+let grounded=true;
 
-    season: "Season 1",
+let hp=100;
+let ammo=30;
+let reserve=120;
 
-    news: [
-      {
-        title:"シーズン1 開幕！",
-        description:"新しい島でバトルロイヤルを開始しよう！",
-        video:""
-      }
-    ],
+let weapon="RIFLE";
 
-    shop: [],
+let storm=90;
+let remaining=10;
 
-  };
+let buildings=[];
+let trees=[];
+let items=[];
+let bullets=[];
 
-  localStorage.setItem(
-    DB_KEY,
-    JSON.stringify(db)
+const worldSize=180;
+
+
+/* =====================================================
+   THREE.JS 初期化
+===================================================== */
+
+function init3D(){
+
+  scene=new THREE.Scene();
+
+  scene.background=new THREE.Color(0x78c9f5);
+
+  scene.fog=new THREE.Fog(
+    0x78c9f5,
+    80,
+    300
   );
 
-}
-
-
-/* ============================================================
-   CURRENT USER
-============================================================ */
-
-let currentUser = null;
-
-
-/* ============================================================
-   SAVE
-============================================================ */
-
-function saveDB(){
-
-  localStorage.setItem(
-    DB_KEY,
-    JSON.stringify(db)
+  camera=new THREE.PerspectiveCamera(
+    70,
+    innerWidth/innerHeight,
+    0.1,
+    500
   );
 
-}
-
-
-/* ============================================================
-   LOGIN
-============================================================ */
-
-function login(){
-
-  const name =
-    document.getElementById("loginName").value.trim();
-
-  const password =
-    document.getElementById("loginPassword").value;
-
-  if(!name){
-
-    alert("ユーザー名を入力してください。");
-
-    return;
-
-  }
-
-
-  /* ADMIN */
-
-  if(
-    name === "admin" &&
-    password === "admin123"
-  ){
-
-    currentUser = {
-      name:"admin",
-      admin:true
-    };
-
-    document
-      .getElementById("loginScreen")
-      .classList.add("hidden");
-
-    document
-      .getElementById("app")
-      .classList.remove("hidden");
-
-    showAdmin();
-
-    return;
-
-  }
-
-
-  /* PLAYER */
-
-  let player =
-    db.players.find(
-      p => p.name === name
-    );
-
-
-  if(!player){
-
-    player = {
-
-      name:name,
-
-      level:1,
-
-      wins:0,
-
-      kills:0,
-
-      coins:1500,
-
-      banned:false,
-
-      skin:"初期スキン"
-
-    };
-
-    db.players.push(player);
-
-    saveDB();
-
-  }
-
-
-  if(player.banned){
-
-    alert("このプレイヤーは利用停止されています。");
-
-    return;
-
-  }
-
-
-  currentUser = {
-
-    name:name,
-
-    admin:false
-
-  };
-
-
-  document
-    .getElementById("loginScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("app")
-    .classList.remove("hidden");
-
-  document
-    .getElementById("userNameDisplay")
-    .textContent = name;
-
-  showScreen("lobby");
-
-  updatePlayerStats();
-
-}
-
-
-/* ============================================================
-   LOGOUT
-============================================================ */
-
-function logout(){
-
-  currentUser = null;
-
-  document
-    .getElementById("app")
-    .classList.add("hidden");
-
-  document
-    .getElementById("loginScreen")
-    .classList.remove("hidden");
-
-  document
-    .getElementById("loginName")
-    .value = "";
-
-  document
-    .getElementById("loginPassword")
-    .value = "";
-
-}
-
-
-/* ============================================================
-   SCREEN
-============================================================ */
-
-function showScreen(name){
-
-  document
-    .querySelectorAll(".screen")
-    .forEach(
-      el => el.classList.add("hidden")
-    );
-
-
-  const target =
-    document.getElementById(
-      name + "Screen"
-    );
-
-  if(target){
-
-    target.classList.remove("hidden");
-
-  }
-
-
-  if(name === "news"){
-
-    renderNews();
-
-  }
-
-  if(name === "stats"){
-
-    updatePlayerStats();
-
-  }
-
-}
-
-
-/* ============================================================
-   PLAYER DATA
-============================================================ */
-
-function getPlayer(){
-
-  if(!currentUser) return null;
-
-  return db.players.find(
-    p => p.name === currentUser.name
-  );
-
-}
-
-
-function updatePlayerStats(){
-
-  const p = getPlayer();
-
-  if(!p) return;
-
-  document.getElementById("statLevel").textContent =
-    p.level;
-
-  document.getElementById("statWins").textContent =
-    p.wins;
-
-  document.getElementById("statKills").textContent =
-    p.kills;
-
-  document.getElementById("statCoins").textContent =
-    p.coins;
-
-  document.getElementById("skinText").textContent =
-    p.skin;
-
-}
-
-
-/* ============================================================
-   SHOP
-============================================================ */
-
-function buyItem(name,price){
-
-  const p = getPlayer();
-
-  if(!p) return;
-
-  if(p.coins < price){
-
-    alert("コインが足りません。");
-
-    return;
-
-  }
-
-  p.coins -= price;
-
-  if(name.includes("ウォリアー")){
-
-    p.skin = name;
-
-  }
-
-  saveDB();
-
-  updatePlayerStats();
-
-  alert(
-    name + " を購入しました！"
-  );
-
-}
-
-
-/* ============================================================
-   NEWS
-============================================================ */
-
-function renderNews(){
-
-  const list =
-    document.getElementById("newsList");
-
-  list.innerHTML = "";
-
-  db.news
-    .slice()
-    .reverse()
-    .forEach(n => {
-
-      const div =
-        document.createElement("div");
-
-      div.className =
-        "card newsCard";
-
-      div.innerHTML = `
-
-        <div class="newsThumb">
-          🎬
-        </div>
-
-        <div>
-          <h2>${escapeHTML(n.title)}</h2>
-
-          <p>
-            ${escapeHTML(n.description)}
-          </p>
-
-          ${
-            n.video
-            ?
-            `<button
-              class="actionButton"
-              onclick="window.open('${escapeAttr(n.video)}','_blank')"
-            >
-              ▶ 動画を見る
-            </button>`
-            :
-            ""
-          }
-
-        </div>
-
-      `;
-
-      list.appendChild(div);
-
-    });
-
-}
-
-
-function escapeHTML(text){
-
-  return String(text)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-
-}
-
-
-function escapeAttr(text){
-
-  return String(text)
-    .replaceAll("'","%27");
-
-}
-
-
-/* ============================================================
-   ADMIN
-============================================================ */
-
-function showAdmin(){
-
-  document
-    .querySelectorAll(".screen")
-    .forEach(
-      el => el.classList.add("hidden")
-    );
-
-  document
-    .getElementById("adminScreen")
-    .classList.remove("hidden");
-
-  adminPage("dashboard");
-
-}
-
-
-function adminPage(page){
-
-  const area =
-    document.getElementById("adminContent");
-
-
-  /* DASHBOARD */
-
-  if(page === "dashboard"){
-
-    area.innerHTML = `
-
-      <h1 class="pageTitle">
-        📊 管理ダッシュボード
-      </h1>
-
-      <div class="statGrid">
-
-        <div class="stat">
-          プレイヤー
-          <strong>${db.players.length}</strong>
-        </div>
-
-        <div class="stat">
-          チャプター
-          <strong>${escapeHTML(db.chapter)}</strong>
-        </div>
-
-        <div class="stat">
-          シーズン
-          <strong>${escapeHTML(db.season)}</strong>
-        </div>
-
-        <div class="stat">
-          ニュース
-          <strong>${db.news.length}</strong>
-        </div>
-
-      </div>
-
-      <br>
-
-      <div class="card">
-
-        <h2>現在の設定</h2>
-
-        <p>
-          Chapter：
-          <b>${escapeHTML(db.chapter)}</b>
-        </p>
-
-        <p>
-          Season：
-          <b>${escapeHTML(db.season)}</b>
-        </p>
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  /* PLAYERS */
-
-  if(page === "players"){
-
-    let rows = "";
-
-    db.players.forEach(
-      (p,index) => {
-
-        rows += `
-
-          <tr>
-
-            <td>
-              ${escapeHTML(p.name)}
-            </td>
-
-            <td>${p.level}</td>
-
-            <td>${p.wins}</td>
-
-            <td>${p.kills}</td>
-
-            <td>
-              ${
-                p.banned
-                ? "🚫 BAN"
-                : "🟢 OK"
-              }
-            </td>
-
-            <td>
-
-              <button
-                class="actionButton ${
-                  p.banned
-                  ? "green"
-                  : "red"
-                }"
-                onclick="toggleBan(${index})"
-              >
-                ${
-                  p.banned
-                  ? "BAN解除"
-                  : "BAN"
-                }
-              </button>
-
-              <button
-                class="actionButton red"
-                onclick="deletePlayer(${index})"
-              >
-                削除
-              </button>
-
-            </td>
-
-          </tr>
-
-        `;
-
-      }
-    );
-
-
-    area.innerHTML = `
-
-      <h1 class="pageTitle">
-        👥 プレイヤー管理
-      </h1>
-
-      <table class="adminTable">
-
-        <thead>
-
-          <tr>
-            <th>名前</th>
-            <th>Lv</th>
-            <th>勝利</th>
-            <th>撃破</th>
-            <th>状態</th>
-            <th>操作</th>
-          </tr>
-
-        </thead>
-
-        <tbody>
-          ${rows}
-        </tbody>
-
-      </table>
-
-    `;
-
-    return;
-
-  }
-
-
-  /* CHAPTER */
-
-  if(page === "chapter"){
-
-    area.innerHTML = `
-
-      <h1 class="pageTitle">
-        🌎 チャプター設定
-      </h1>
-
-      <div class="formBox">
-
-        <label>
-          チャプター名
-        </label>
-
-        <input
-          id="chapterInput"
-          value="${escapeHTML(db.chapter)}"
-        >
-
-        <button
-          class="bigButton"
-          onclick="saveChapter()"
-        >
-          保存
-        </button>
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  /* SEASON */
-
-  if(page === "season"){
-
-    area.innerHTML = `
-
-      <h1 class="pageTitle">
-        🏆 シーズン設定
-      </h1>
-
-      <div class="formBox">
-
-        <label>
-          シーズン名
-        </label>
-
-        <input
-          id="seasonInput"
-          value="${escapeHTML(db.season)}"
-        >
-
-        <label>
-          開始日
-        </label>
-
-        <input
-          id="seasonStart"
-          type="date"
-        >
-
-        <label>
-          終了日
-        </label>
-
-        <input
-          id="seasonEnd"
-          type="date"
-        >
-
-        <button
-          class="bigButton"
-          onclick="saveSeason()"
-        >
-          シーズンを保存
-        </button>
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  /* NEWS */
-
-  if(page === "news"){
-
-    let newsRows = "";
-
-    db.news.forEach(
-      (n,i) => {
-
-        newsRows += `
-
-          <tr>
-
-            <td>
-              ${escapeHTML(n.title)}
-            </td>
-
-            <td>
-              ${
-                n.video
-                ? "🎬 あり"
-                : "なし"
-              }
-            </td>
-
-            <td>
-
-              <button
-                class="actionButton red"
-                onclick="deleteNews(${i})"
-              >
-                削除
-              </button>
-
-            </td>
-
-          </tr>
-
-        `;
-
-      }
-    );
-
-
-    area.innerHTML = `
-
-      <h1 class="pageTitle">
-        📰 ニュース投稿
-      </h1>
-
-      <div class="formBox">
-
-        <label>
-          タイトル
-        </label>
-
-        <input
-          id="newsTitle"
-          placeholder="新シーズン開始！"
-        >
-
-        <label>
-          説明
-        </label>
-
-        <textarea
-          id="newsDescription"
-          placeholder="ニュース内容"
-        ></textarea>
-
-        <label>
-          動画URL
-        </label>
-
-        <input
-          id="newsVideo"
-          placeholder="https://..."
-        >
-
-        <button
-          class="bigButton"
-          onclick="addNews()"
-        >
-          📰 公開
-        </button>
-
-      </div>
-
-      <br>
-
-      <table class="adminTable">
-
-        <thead>
-          <tr>
-            <th>タイトル</th>
-            <th>動画</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          ${newsRows}
-        </tbody>
-
-      </table>
-
-    `;
-
-    return;
-
-  }
-
-
-  /* SHOP */
-
-  if(page === "shop"){
-
-    area.innerHTML = `
-
-      <h1 class="pageTitle">
-        🛒 ショップ管理
-      </h1>
-
-      <div class="formBox">
-
-        <label>
-          アイテム名
-        </label>
-
-        <input
-          id="shopName"
-          placeholder="新しいスキン"
-        >
-
-        <label>
-          価格
-        </label>
-
-        <input
-          id="shopPrice"
-          type="number"
-          value="500"
-        >
-
-        <button
-          class="bigButton"
-          onclick="addShopItem()"
-        >
-          商品追加
-        </button>
-
-      </div>
-
-      <br>
-
-      <div class="cards">
-
-        ${
-          db.shop.map(
-            (s,i) => `
-
-              <div class="card">
-
-                <h3>
-                  ${escapeHTML(s.name)}
-                </h3>
-
-                <p>
-                  🪙 ${s.price}
-                </p>
-
-                <button
-                  class="actionButton red"
-                  onclick="deleteShopItem(${i})"
-                >
-                  削除
-                </button>
-
-              </div>
-
-            `
-          ).join("")
-        }
-
-      </div>
-
-    `;
-
-  }
-
-}
-
-
-/* ============================================================
-   ADMIN ACTIONS
-============================================================ */
-
-function toggleBan(index){
-
-  db.players[index].banned =
-    !db.players[index].banned;
-
-  saveDB();
-
-  adminPage("players");
-
-}
-
-
-function deletePlayer(index){
-
-  if(
-    !confirm(
-      "このプレイヤーを削除しますか？"
-    )
-  ) return;
-
-  db.players.splice(index,1);
-
-  saveDB();
-
-  adminPage("players");
-
-}
-
-
-function saveChapter(){
-
-  const value =
-    document
-      .getElementById("chapterInput")
-      .value
-      .trim();
-
-  if(!value) return;
-
-  db.chapter = value;
-
-  saveDB();
-
-  alert("チャプターを保存しました。");
-
-  adminPage("dashboard");
-
-}
-
-
-function saveSeason(){
-
-  const value =
-    document
-      .getElementById("seasonInput")
-      .value
-      .trim();
-
-  if(!value) return;
-
-  db.season = value;
-
-  saveDB();
-
-  alert("シーズンを保存しました。");
-
-  adminPage("dashboard");
-
-}
-
-
-function addNews(){
-
-  const title =
-    document
-      .getElementById("newsTitle")
-      .value
-      .trim();
-
-  const description =
-    document
-      .getElementById("newsDescription")
-      .value
-      .trim();
-
-  const video =
-    document
-      .getElementById("newsVideo")
-      .value
-      .trim();
-
-
-  if(!title){
-
-    alert("タイトルを入力してください。");
-
-    return;
-
-  }
-
-
-  db.news.push({
-
-    title:title,
-
-    description:description,
-
-    video:video
-
+  renderer=new THREE.WebGLRenderer({
+    antialias:true
   });
 
+  renderer.setSize(
+    innerWidth,
+    innerHeight
+  );
 
-  saveDB();
+  renderer.setPixelRatio(
+    Math.min(devicePixelRatio,2)
+  );
 
-  alert("ニュースを公開しました。");
+  document
+    .getElementById("game")
+    .appendChild(renderer.domElement);
 
-  adminPage("news");
+  clock=new THREE.Clock();
 
+  /* 光 */
+
+  const hemi=new THREE.HemisphereLight(
+    0xbde8ff,
+    0x304020,
+    2.2
+  );
+
+  scene.add(hemi);
+
+  const sun=new THREE.DirectionalLight(
+    0xffffff,
+    2.5
+  );
+
+  sun.position.set(
+    80,
+    120,
+    50
+  );
+
+  sun.castShadow=true;
+
+  scene.add(sun);
+
+  createWorld();
+  createPlayer();
+
+  window.addEventListener(
+    "resize",
+    resize
+  );
+
+  animate();
 }
 
 
-function deleteNews(index){
+/* =====================================================
+   地面
+===================================================== */
 
-  db.news.splice(index,1);
+function createWorld(){
 
-  saveDB();
-
-  adminPage("news");
-
-}
-
-
-function addShopItem(){
-
-  const name =
-    document
-      .getElementById("shopName")
-      .value
-      .trim();
-
-  const price =
-    Number(
-      document
-        .getElementById("shopPrice")
-        .value
+  const groundGeo=
+    new THREE.PlaneGeometry(
+      worldSize,
+      worldSize,
+      30,
+      30
     );
 
-
-  if(!name || price < 0){
-
-    alert("正しく入力してください。");
-
-    return;
-
-  }
-
-
-  db.shop.push({
-
-    name:name,
-
-    price:price
-
-  });
-
-
-  saveDB();
-
-  adminPage("shop");
-
-}
-
-
-function deleteShopItem(index){
-
-  db.shop.splice(index,1);
-
-  saveDB();
-
-  adminPage("shop");
-
-}
-
-
-/* ============================================================
-   GAME ENGINE
-============================================================ */
-
-const canvas =
-  document.getElementById("gameCanvas");
-
-const ctx =
-  canvas.getContext("2d");
-
-let gameRunning = false;
-
-let gameAnimation = 0;
-
-let keys = {};
-
-let mouseDown = false;
-
-let gamepad = null;
-
-let player = {
-
-  x:0,
-
-  y:0,
-
-  z:0,
-
-  vx:0,
-
-  vy:0,
-
-  vz:0,
-
-  yaw:0,
-
-  pitch:-0.25,
-
-  hp:100,
-
-  ammo:30,
-
-  reserve:120,
-
-  weapon:"RIFLE",
-
-  shotgun:false,
-
-  building:false,
-
-  buildType:"wall"
-
-};
-
-let bullets = [];
-
-let enemies = [];
-
-let items = [];
-
-let builds = [];
-
-let particles = [];
-
-let storm = {
-
-  timer:90,
-
-  radius:55
-
-};
-
-
-/* ============================================================
-   RESIZE
-============================================================ */
-
-function resizeCanvas(){
-
-  canvas.width =
-    window.innerWidth * devicePixelRatio;
-
-  canvas.height =
-    window.innerHeight * devicePixelRatio;
-
-  ctx.setTransform(
-    devicePixelRatio,
-    0,
-    0,
-    devicePixelRatio,
-    0,
-    0
-  );
-
-}
-
-window.addEventListener(
-  "resize",
-  resizeCanvas
-);
-
-resizeCanvas();
-
-
-/* ============================================================
-   START GAME
-============================================================ */
-
-function startGame(){
-
-  showScreen("game");
-
-  resetGame();
-
-  gameRunning = true;
-
-  cancelAnimationFrame(gameAnimation);
-
-  gameLoop(
-    performance.now()
-  );
-
-}
-
-
-function resetGame(){
-
-  player = {
-
-    x:0,
-
-    y:0,
-
-    z:2,
-
-    vx:0,
-
-    vy:0,
-
-    vz:0,
-
-    yaw:0,
-
-    pitch:-0.2,
-
-    hp:100,
-
-    ammo:30,
-
-    reserve:120,
-
-    weapon:"RIFLE",
-
-    shotgun:false,
-
-    building:false,
-
-    buildType:"wall"
-
-  };
-
-
-  bullets = [];
-
-  particles = [];
-
-  builds = [];
-
-  items = [];
-
-  enemies = [];
-
-
-  storm.timer = 90;
-
-  storm.radius = 55;
-
-
-  /* enemies */
-
-  for(let i=0;i<9;i++){
-
-    enemies.push({
-
-      x:(Math.random()-.5)*80,
-
-      y:(Math.random()-.5)*80,
-
-      z:2,
-
-      hp:100,
-
-      color:i%2
-        ? "#39c878"
-        : "#e95b63",
-
-      speed:.018+Math.random()*.015,
-
-      cooldown:Math.random()*200
-
+  const groundMat=
+    new THREE.MeshStandardMaterial({
+      color:0x4fa447,
+      roughness:1
     });
 
-  }
-
-
-  /* items */
-
-  for(let i=0;i<25;i++){
-
-    items.push({
-
-      x:(Math.random()-.5)*90,
-
-      y:(Math.random()-.5)*90,
-
-      type:
-        Math.random()<.5
-        ? "ammo"
-        : "heal"
-
-    });
-
-  }
-
-
-  updateHUD();
-
-}
-
-
-/* ============================================================
-   INPUT
-============================================================ */
-
-window.addEventListener(
-  "keydown",
-  e => {
-
-    keys[e.code] = true;
-
-
-    if(!gameRunning) return;
-
-
-    if(e.code === "ShiftLeft"){
-
-      keys.shift = true;
-
-    }
-
-
-    if(e.code === "Digit1"){
-
-      player.weapon = "RIFLE";
-
-      player.shotgun = false;
-
-      player.ammo = 30;
-
-      player.reserve = 120;
-
-    }
-
-
-    if(e.code === "Digit2"){
-
-      player.weapon = "SHOTGUN";
-
-      player.shotgun = true;
-
-      player.ammo = 8;
-
-      player.reserve = 32;
-
-    }
-
-
-    if(e.code === "KeyB"){
-
-      player.building =
-        !player.building;
-
-      document
-        .getElementById("buildHud")
-        .style.display =
-        player.building
-        ? "block"
-        : "none";
-
-    }
-
-
-    if(
-      player.building &&
-      e.code === "Digit1"
-    ){
-
-      player.buildType = "wall";
-
-    }
-
-
-    if(
-      player.building &&
-      e.code === "Digit2"
-    ){
-
-      player.buildType = "floor";
-
-    }
-
-
-    if(
-      player.building &&
-      e.code === "Digit3"
-    ){
-
-      player.buildType = "ramp";
-
-    }
-
-
-    if(e.code === "KeyR"){
-
-      reload();
-
-    }
-
-
-    if(e.code === "KeyE"){
-
-      pickupItem();
-
-    }
-
-
-    if(e.code === "Escape"){
-
-      backToLobby();
-
-    }
-
-
-    if(
-      e.code === "Space" &&
-      player.z <= 2.01
-    ){
-
-      player.vz = .18;
-
-    }
-
-  }
-);
-
-
-window.addEventListener(
-  "keyup",
-  e => {
-
-    keys[e.code] = false;
-
-  }
-);
-
-
-canvas.addEventListener(
-  "mousedown",
-  e => {
-
-    if(e.button === 0){
-
-      mouseDown = true;
-
-      shoot();
-
-    }
-
-  }
-);
-
-
-window.addEventListener(
-  "mouseup",
-  e => {
-
-    if(e.button === 0){
-
-      mouseDown = false;
-
-    }
-
-  }
-);
-
-
-/* ============================================================
-   CAMERA MOUSE
-============================================================ */
-
-let lastMouseX = 0;
-
-let lastMouseY = 0;
-
-canvas.addEventListener(
-  "mousemove",
-  e => {
-
-    if(!gameRunning) return;
-
-    if(
-      document.pointerLockElement === canvas
-    ){
-
-      player.yaw -= e.movementX*.0025;
-
-      player.pitch -= e.movementY*.0025;
-
-      player.pitch =
-        Math.max(
-          -.8,
-          Math.min(.5,player.pitch)
-        );
-
-    }
-
-  }
-);
-
-
-canvas.addEventListener(
-  "click",
-  () => {
-
-    if(
-      document.pointerLockElement !== canvas
-    ){
-
-      canvas.requestPointerLock();
-
-    }
-
-  }
-);
-
-
-/* ============================================================
-   GAMEPAD
-============================================================ */
-
-function updateGamepad(){
-
-  const pads =
-    navigator.getGamepads
-    ? navigator.getGamepads()
-    : [];
-
-  gamepad =
-    pads[0] || null;
-
-  if(!gamepad) return;
-
-
-  const lx =
-    Math.abs(gamepad.axes[0]) > .12
-    ? gamepad.axes[0]
-    : 0;
-
-  const ly =
-    Math.abs(gamepad.axes[1]) > .12
-    ? gamepad.axes[1]
-    : 0;
-
-  const rx =
-    Math.abs(gamepad.axes[2]) > .12
-    ? gamepad.axes[2]
-    : 0;
-
-  const ry =
-    Math.abs(gamepad.axes[3]) > .12
-    ? gamepad.axes[3]
-    : 0;
-
-
-  player.yaw -= rx*.045;
-
-  player.pitch -= ry*.035;
-
-  player.pitch =
-    Math.max(
-      -.8,
-      Math.min(.5,player.pitch)
+  const ground=
+    new THREE.Mesh(
+      groundGeo,
+      groundMat
     );
 
+  ground.rotation.x=-Math.PI/2;
 
-  const speed =
-    gamepad.buttons[10]?.pressed
-    ? .16
-    : .08;
+  scene.add(ground);
 
+  /* 道路 */
 
-  movePlayer(
-    lx*speed,
-    -ly*speed
+  createRoad(
+    0,
+    0,
+    worldSize,
+    10
   );
 
+  createRoad(
+    0,
+    0,
+    10,
+    worldSize
+  );
 
-  if(
-    gamepad.buttons[7]?.pressed
-  ){
+  /* 建物 */
 
-    shoot();
+  for(let i=0;i<18;i++){
 
+    const x=
+      (Math.random()-.5)*150;
+
+    const z=
+      (Math.random()-.5)*150;
+
+    if(Math.abs(x)<18 &&
+       Math.abs(z)<18){
+      continue;
+    }
+
+    createBuilding(
+      x,
+      z
+    );
   }
 
+  /* 木 */
 
-  if(
-    gamepad.buttons[0]?.pressed &&
-    player.z <= 2.01
-  ){
+  for(let i=0;i<75;i++){
 
-    player.vz=.18;
+    const x=
+      (Math.random()-.5)*170;
 
+    const z=
+      (Math.random()-.5)*170;
+
+    if(Math.abs(x)<20 &&
+       Math.abs(z)<20){
+      continue;
+    }
+
+    createTree(x,z);
   }
+
+  /* 岩 */
+
+  for(let i=0;i<35;i++){
+
+    const x=
+      (Math.random()-.5)*170;
+
+    const z=
+      (Math.random()-.5)*170;
+
+    createRock(x,z);
+  }
+
+  /* アイテム */
+
+  createItem(
+    12,
+    0.8,
+    -8,
+    "🔫 RIFLE"
+  );
+
+  createItem(
+    -10,
+    0.8,
+    7,
+    "💚 MEDKIT"
+  );
 
 }
 
 
-/* ============================================================
-   MOVE
-============================================================ */
+/* =====================================================
+   道路
+===================================================== */
 
-function movePlayer(
-  forward,
-  side
+function createRoad(
+  x,
+  z,
+  width,
+  depth
 ){
 
-  const sin =
-    Math.sin(player.yaw);
+  const geo=
+    new THREE.BoxGeometry(
+      width,
+      .08,
+      depth
+    );
 
-  const cos =
-    Math.cos(player.yaw);
+  const mat=
+    new THREE.MeshStandardMaterial({
+      color:0x30343a,
+      roughness:.9
+    });
 
+  const road=
+    new THREE.Mesh(
+      geo,
+      mat
+    );
 
-  player.x +=
-    forward*cos +
-    side*sin;
+  road.position.set(
+    x,
+    .02,
+    z
+  );
 
-  player.y +=
-    forward*sin -
-    side*cos;
-
-
-  player.x =
-    Math.max(-55,Math.min(55,player.x));
-
-  player.y =
-    Math.max(-55,Math.min(55,player.y));
+  scene.add(road);
 
 }
 
 
-/* ============================================================
-   GAME UPDATE
-============================================================ */
+/* =====================================================
+   建物
+===================================================== */
 
-let lastTime = 0;
+function createBuilding(x,z){
 
-function updateGame(time){
+  const group=
+    new THREE.Group();
 
-  const dt =
-    Math.min(
-      40,
-      time-lastTime || 16
+  const w=10+
+    Math.random()*8;
+
+  const d=8+
+    Math.random()*8;
+
+  const h=5+
+    Math.random()*3;
+
+  const body=
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        w,
+        h,
+        d
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color:
+          new THREE.Color()
+            .setHSL(
+              Math.random()*.08+.05,
+              .45,
+              .35
+            )
+      })
+
     );
 
-  lastTime = time;
+  body.position.y=h/2;
+
+  group.add(body);
+
+  /* 屋根 */
+
+  const roof=
+    new THREE.Mesh(
+
+      new THREE.ConeGeometry(
+        Math.max(w,d)*.75,
+        3.5,
+        4
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color:0x51382c
+      })
+
+    );
+
+  roof.position.y=h+1.7;
+
+  roof.rotation.y=Math.PI/4;
+
+  group.add(roof);
+
+  group.position.set(x,0,z);
+
+  scene.add(group);
+
+  buildings.push(group);
+}
 
 
-  updateGamepad();
+/* =====================================================
+   木
+===================================================== */
 
+function createTree(x,z){
 
-  let forward = 0;
+  const group=
+    new THREE.Group();
 
-  let side = 0;
+  const trunk=
+    new THREE.Mesh(
 
+      new THREE.CylinderGeometry(
+        .6,
+        .8,
+        4,
+        8
+      ),
 
-  if(keys.KeyW) forward += 1;
+      new THREE.MeshStandardMaterial({
+        color:0x6b4328
+      })
 
-  if(keys.KeyS) forward -= 1;
+    );
 
-  if(keys.KeyA) side -= 1;
+  trunk.position.y=2;
 
-  if(keys.KeyD) side += 1;
+  group.add(trunk);
 
+  for(let i=0;i<3;i++){
 
-  const sprint =
-    keys.ShiftLeft ||
-    keys.ShiftRight;
+    const leaves=
+      new THREE.Mesh(
 
+        new THREE.ConeGeometry(
+          3.5-i*.45,
+          5,
+          8
+        ),
 
-  const speed =
-    sprint ? .17 : .09;
+        new THREE.MeshStandardMaterial({
+          color:0x126b2d
+        })
 
-
-  if(forward || side){
-
-    const len =
-      Math.hypot(
-        forward,
-        side
       );
 
-    forward/=len;
+    leaves.position.y=
+      4+i*2.4;
 
-    side/=len;
+    group.add(leaves);
 
-    movePlayer(
-      forward*speed,
-      side*speed
+  }
+
+  group.position.set(x,0,z);
+
+  scene.add(group);
+
+  trees.push(group);
+}
+
+
+/* =====================================================
+   岩
+===================================================== */
+
+function createRock(x,z){
+
+  const rock=
+    new THREE.Mesh(
+
+      new THREE.DodecahedronGeometry(
+        .8+Math.random()*1.5
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color:0x777777,
+        roughness:1
+      })
+
     );
 
-  }
-
-
-  /* gravity */
-
-  player.vz -= .008;
-
-  player.z += player.vz;
-
-
-  if(player.z < 2){
-
-    player.z = 2;
-
-    player.vz = 0;
-
-  }
-
-
-  /* automatic fire */
-
-  if(mouseDown){
-
-    shoot();
-
-  }
-
-
-  /* enemies */
-
-  enemies.forEach(
-    enemy => {
-
-      const dx =
-        player.x-enemy.x;
-
-      const dy =
-        player.y-enemy.y;
-
-      const dist =
-        Math.hypot(dx,dy);
-
-
-      if(dist > 5){
-
-        enemy.x +=
-          dx/dist*
-          enemy.speed*
-          dt;
-
-        enemy.y +=
-          dy/dist*
-          enemy.speed*
-          dt;
-
-      }
-
-
-      enemy.cooldown -= dt;
-
-
-      if(
-        dist < 28 &&
-        enemy.cooldown <= 0
-      ){
-
-        enemy.cooldown =
-          800+Math.random()*1000;
-
-        player.hp -=
-          3+Math.random()*4;
-
-        spawnParticles(
-          player.x,
-          player.y,
-          "#ff4444",
-          5
-        );
-
-      }
-
-    }
+  rock.position.set(
+    x,
+    .8,
+    z
   );
 
-
-  /* bullets */
-
-  bullets.forEach(
-    b => {
-
-      b.x +=
-        b.dx*b.speed*dt;
-
-      b.y +=
-        b.dy*b.speed*dt;
-
-      b.life -= dt;
-
-      enemies.forEach(
-        enemy => {
-
-          const d =
-            Math.hypot(
-              b.x-enemy.x,
-              b.y-enemy.y
-            );
-
-          if(
-            d < 2.5 &&
-            !b.hit
-          ){
-
-            b.hit=true;
-
-            enemy.hp -=
-              b.damage;
-
-            spawnParticles(
-              enemy.x,
-              enemy.y,
-              "#ffdf57",
-              8
-            );
-
-          }
-
-        }
-      );
-
-    }
+  rock.rotation.set(
+    Math.random(),
+    Math.random(),
+    Math.random()
   );
 
+  scene.add(rock);
+}
 
-  bullets =
-    bullets.filter(
-      b =>
-        b.life > 0 &&
-        !b.hit
+
+/* =====================================================
+   プレイヤー
+===================================================== */
+
+function createPlayer(){
+
+  player=
+    new THREE.Group();
+
+  /* 胴体 */
+
+  playerBody=
+    new THREE.Mesh(
+
+      new THREE.CapsuleGeometry(
+        .65,
+        1.4,
+        8,
+        16
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color:0x2563eb
+      })
+
     );
 
+  playerBody.position.y=1.5;
 
-  enemies =
-    enemies.filter(
-      e => e.hp > 0
+  player.add(playerBody);
+
+  /* 頭 */
+
+  playerHead=
+    new THREE.Mesh(
+
+      new THREE.SphereGeometry(
+        .65,
+        20,
+        20
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color:0xffc08a
+      })
+
     );
 
+  playerHead.position.y=2.9;
 
-  /* storm */
+  player.add(playerHead);
 
-  storm.timer -= dt/1000;
+  /* 武器 */
 
-  if(storm.timer <= 0){
+  const gun=
+    new THREE.Mesh(
 
-    storm.timer=0;
+      new THREE.BoxGeometry(
+        .25,
+        .25,
+        1.7
+      ),
 
-    storm.radius =
-      Math.max(
-        15,
-        storm.radius-.003*dt
-      );
+      new THREE.MeshStandardMaterial({
+        color:0x202020
+      })
 
-    const dist =
-      Math.hypot(
-        player.x,
-        player.y
-      );
+    );
+
+  gun.position.set(
+    .75,
+    1.8,
+    -.65
+  );
+
+  gun.rotation.y=
+    Math.PI/2;
+
+  player.add(gun);
+
+  player.position.set(
+    0,
+    0,
+    12
+  );
+
+  scene.add(player);
+
+}
+
+
+/* =====================================================
+   アイテム
+===================================================== */
+
+function createItem(
+  x,
+  y,
+  z,
+  name
+){
+
+  const item=
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        .8,
+        .8,
+        .8
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color:
+          name.includes("MED")
+          ?0x22c55e
+          :0xfacc15,
+        emissive:
+          name.includes("MED")
+          ?0x073b16
+          :0x3d3000
+      })
+
+    );
+
+  item.position.set(
+    x,y,z
+  );
+
+  item.userData.name=name;
+
+  scene.add(item);
+
+  items.push(item);
+
+}
+
+
+/* =====================================================
+   キー入力
+===================================================== */
+
+addEventListener(
+  "keydown",
+  e=>{
+
+    keys[e.code]=true;
+
+    if(e.code==="Space"){
+      jump();
+    }
+
+    if(e.code==="ShiftLeft"||
+       e.code==="ShiftRight"){
+      keys.shift=true;
+    }
+
+    if(e.code==="KeyB"){
+      build();
+    }
+
+    if(e.code==="KeyE"){
+      pickup();
+    }
+
+    if(e.code==="Digit1"){
+      weapon="RIFLE";
+      updateWeapon();
+    }
+
+    if(e.code==="Digit2"){
+      weapon="SHOTGUN";
+      updateWeapon();
+    }
+
+    if(e.code==="KeyR"){
+      reload();
+    }
+
+    if(e.code==="Escape"){
+      returnLobby();
+    }
+
+  }
+);
+
+addEventListener(
+  "keyup",
+  e=>{
+    keys[e.code]=false;
+
+    if(e.code==="ShiftLeft"||
+       e.code==="ShiftRight"){
+      keys.shift=false;
+    }
+  }
+);
+
+
+/* =====================================================
+   マウスカメラ
+===================================================== */
+
+let mouseDown=false;
+
+addEventListener(
+  "mousedown",
+  e=>{
+
+    if(!running)return;
+
+    mouseDown=true;
+
+    if(e.button===0){
+      shoot();
+    }
+
+  }
+);
+
+addEventListener(
+  "mouseup",
+  ()=>{
+    mouseDown=false;
+  }
+);
+
+addEventListener(
+  "mousemove",
+  e=>{
+
+    if(!running)return;
 
     if(
-      dist > storm.radius
+      document.pointerLockElement ===
+      renderer.domElement
     ){
 
-      player.hp -=
-        .025*dt;
+      yaw -= e.movementX*.0025;
+
+      pitch -= e.movementY*.0025;
+
+      pitch=
+        Math.max(
+          -.9,
+          Math.min(.5,pitch)
+        );
 
     }
 
   }
+);
 
+rendererReady();
 
-  /* particles */
+function rendererReady(){
 
-  particles.forEach(
-    p => {
-
-      p.life -= dt;
-
-      p.x += p.vx*dt;
-
-      p.y += p.vy*dt;
-
+  document.addEventListener(
+    "click",
+    ()=>{
+      if(running){
+        renderer.domElement.requestPointerLock();
+      }
     }
   );
-
-
-  particles =
-    particles.filter(
-      p => p.life > 0
-    );
-
-
-  /* win */
-
-  if(enemies.length === 0){
-
-    finishGame(true);
-
-  }
-
-
-  if(player.hp <= 0){
-
-    player.hp=0;
-
-    finishGame(false);
-
-  }
-
-
-  updateHUD();
 
 }
 
 
-/* ============================================================
-   SHOOT
-============================================================ */
+/* =====================================================
+   移動
+===================================================== */
 
-let lastShot = 0;
+function updatePlayer(dt){
+
+  if(!running)return;
+
+  const speed=
+    keys.shift ? 12 : 6;
+
+  const forward=
+    new THREE.Vector3(
+      -Math.sin(yaw),
+      0,
+      -Math.cos(yaw)
+    );
+
+  const right=
+    new THREE.Vector3(
+      Math.cos(yaw),
+      0,
+      -Math.sin(yaw)
+    );
+
+  const move=
+    new THREE.Vector3();
+
+  if(keys.KeyW)
+    move.add(forward);
+
+  if(keys.KeyS)
+    move.sub(forward);
+
+  if(keys.KeyD)
+    move.add(right);
+
+  if(keys.KeyA)
+    move.sub(right);
+
+  if(move.length()>0){
+
+    move.normalize();
+
+    player.position.addScaledVector(
+      move,
+      speed*dt
+    );
+
+    player.rotation.y=
+      Math.atan2(
+        move.x,
+        move.z
+      );
+
+  }
+
+  /* 重力 */
+
+  velocityY-=25*dt;
+
+  player.position.y+=
+    velocityY*dt;
+
+  if(player.position.y<=0){
+
+    player.position.y=0;
+
+    velocityY=0;
+
+    grounded=true;
+
+  }
+
+  /* マップ外 */
+
+  const limit=85;
+
+  player.position.x=
+    Math.max(
+      -limit,
+      Math.min(
+        limit,
+        player.position.x
+      )
+    );
+
+  player.position.z=
+    Math.max(
+      -limit,
+      Math.min(
+        limit,
+        player.position.z
+      )
+    );
+
+}
+
+
+/* =====================================================
+   ジャンプ
+===================================================== */
+
+function jump(){
+
+  if(
+    running &&
+    grounded
+  ){
+
+    velocityY=10;
+
+    grounded=false;
+
+  }
+
+}
+
+
+/* =====================================================
+   カメラ
+===================================================== */
+
+function updateCamera(){
+
+  if(!player)return;
+
+  const distance=8;
+
+  const height=3;
+
+  const offset=
+    new THREE.Vector3(
+      Math.sin(yaw)*distance,
+      height+
+        Math.sin(pitch)*4,
+      Math.cos(yaw)*distance
+    );
+
+  const target=
+    player.position.clone();
+
+  target.y+=2;
+
+  const desired=
+    target.clone().add(offset);
+
+  camera.position.lerp(
+    desired,
+    .12
+  );
+
+  camera.lookAt(target);
+
+}
+
+
+/* =====================================================
+   射撃
+===================================================== */
 
 function shoot(){
 
-  if(!gameRunning) return;
+  if(!running)return;
 
-  if(player.building){
-
-    build();
-
-    return;
-
-  }
-
-
-  const now =
-    performance.now();
-
-  const cooldown =
-    player.shotgun
-    ? 550
-    : 150;
-
-
-  if(now-lastShot < cooldown)
-    return;
-
-
-  lastShot=now;
-
-
-  if(player.ammo <= 0){
+  if(ammo<=0){
 
     reload();
 
@@ -3211,1195 +1584,657 @@ function shoot(){
 
   }
 
+  ammo--;
 
-  player.ammo--;
+  updateAmmo();
 
+  const dir=
+    new THREE.Vector3();
 
-  const spread =
-    player.shotgun
-    ? .12
-    : .015;
+  camera.getWorldDirection(dir);
 
+  const bullet=
+    new THREE.Mesh(
 
-  bullets.push({
+      new THREE.SphereGeometry(
+        .09,
+        8,
+        8
+      ),
 
-    x:player.x,
+      new THREE.MeshBasicMaterial({
+        color:0xffdf4d
+      })
 
-    y:player.y,
+    );
 
-    dx:
-      Math.sin(player.yaw) +
-      (Math.random()-.5)*spread,
+  bullet.position.copy(
+    camera.position
+  );
 
-    dy:
-      Math.cos(player.yaw) +
-      (Math.random()-.5)*spread,
+  bullet.userData.velocity=
+    dir.multiplyScalar(60);
 
-    speed:.22,
+  bullet.userData.life=2;
 
-    damage:
-      player.shotgun
-      ? 35
-      : 25,
+  scene.add(bullet);
 
-    life:3000
-
-  });
+  bullets.push(bullet);
 
 }
 
 
-/* ============================================================
-   RELOAD
-============================================================ */
+/* =====================================================
+   弾
+===================================================== */
+
+function updateBullets(dt){
+
+  for(
+    let i=bullets.length-1;
+    i>=0;
+    i--
+  ){
+
+    const b=bullets[i];
+
+    b.position.addScaledVector(
+      b.userData.velocity,
+      dt
+    );
+
+    b.userData.life-=dt;
+
+    if(b.userData.life<=0){
+
+      scene.remove(b);
+
+      bullets.splice(i,1);
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   リロード
+===================================================== */
 
 function reload(){
 
-  if(
-    player.ammo >=
-    (player.shotgun ? 8 : 30)
-  ) return;
+  const need=30-ammo;
 
-
-  if(player.reserve <= 0)
-    return;
-
-
-  const max =
-    player.shotgun ? 8 : 30;
-
-
-  const amount =
+  const amount=
     Math.min(
-      max-player.ammo,
-      player.reserve
+      need,
+      reserve
     );
 
+  ammo+=amount;
 
-  player.ammo += amount;
+  reserve-=amount;
 
-  player.reserve -= amount;
+  updateAmmo();
 
 }
 
 
-/* ============================================================
-   PICKUP
-============================================================ */
+/* =====================================================
+   武器
+===================================================== */
 
-function pickupItem(){
+function updateWeapon(){
 
-  let closest = null;
-
-  let best = 4;
-
-
-  items.forEach(
-    item => {
-
-      const d =
-        Math.hypot(
-          player.x-item.x,
-          player.y-item.y
-        );
-
-      if(d < best){
-
-        best=d;
-
-        closest=item;
-
-      }
-
-    }
-  );
-
-
-  if(!closest) return;
-
-
-  if(closest.type === "ammo"){
-
-    player.reserve += 30;
-
-  }else{
-
-    player.hp =
-      Math.min(
-        100,
-        player.hp+30
-      );
-
-  }
-
-
-  items =
-    items.filter(
-      i => i !== closest
+  const el=
+    document.getElementById(
+      "weaponName"
     );
 
-
-  updateHUD();
+  el.textContent=
+    weapon==="RIFLE"
+    ?"🔫 RIFLE"
+    :"💥 SHOTGUN";
 
 }
 
 
-/* ============================================================
-   BUILD
-============================================================ */
+/* =====================================================
+   建築
+===================================================== */
 
 function build(){
 
-  const distance = 8;
+  if(!running)return;
 
+  const geo=
+    new THREE.BoxGeometry(
+      5,
+      4,
+      .35
+    );
 
-  const x =
-    player.x +
-    Math.sin(player.yaw)*
-    distance;
-
-  const y =
-    player.y +
-    Math.cos(player.yaw)*
-    distance;
-
-
-  builds.push({
-
-    x:x,
-
-    y:y,
-
-    type:player.buildType,
-
-    hp:100
-
-  });
-
-
-  player.building=false;
-
-  document
-    .getElementById("buildHud")
-    .style.display="none";
-
-}
-
-
-/* ============================================================
-   PARTICLES
-============================================================ */
-
-function spawnParticles(
-  x,
-  y,
-  color,
-  count
-){
-
-  for(let i=0;i<count;i++){
-
-    particles.push({
-
-      x:x,
-
-      y:y,
-
-      vx:(Math.random()-.5)*.04,
-
-      vy:(Math.random()-.5)*.04,
-
-      life:500+Math.random()*500,
-
-      color:color
-
+  const mat=
+    new THREE.MeshStandardMaterial({
+      color:0x9b673d,
+      roughness:.8
     });
 
+  const wall=
+    new THREE.Mesh(
+      geo,
+      mat
+    );
+
+  const dir=
+    new THREE.Vector3(
+      -Math.sin(yaw),
+      0,
+      -Math.cos(yaw)
+    );
+
+  wall.position.copy(
+    player.position
+  );
+
+  wall.position.addScaledVector(
+    dir,
+    4
+  );
+
+  wall.position.y=2;
+
+  wall.rotation.y=yaw;
+
+  scene.add(wall);
+
+}
+
+
+/* =====================================================
+   アイテム取得
+===================================================== */
+
+function pickup(){
+
+  if(!running)return;
+
+  for(
+    let i=items.length-1;
+    i>=0;
+    i--
+  ){
+
+    const item=items[i];
+
+    if(
+      player.position.distanceTo(
+        item.position
+      )<3
+    ){
+
+      const name=
+        item.userData.name;
+
+      if(name.includes("MED")){
+
+        hp=
+          Math.min(
+            100,
+            hp+30
+          );
+
+        updateHP();
+
+      }else{
+
+        reserve+=30;
+
+        updateAmmo();
+
+      }
+
+      scene.remove(item);
+
+      items.splice(i,1);
+
+      break;
+
+    }
+
   }
 
 }
 
 
-/* ============================================================
+/* =====================================================
    HUD
-============================================================ */
+===================================================== */
 
-function updateHUD(){
+function updateHP(){
 
-  document
-    .getElementById("hpText")
-    .textContent =
-      Math.round(player.hp)
-      +" / 100";
+  document.getElementById(
+    "hpText"
+  ).textContent=hp;
 
+  document.getElementById(
+    "hpBar"
+  ).style.width=
+    hp+"%";
 
-  document
-    .getElementById("hpFill")
-    .style.width =
-      player.hp+"%";
+}
 
+function updateAmmo(){
 
-  document
-    .getElementById("ammo")
-    .textContent =
-      player.ammo;
+  document.getElementById(
+    "ammo"
+  ).textContent=ammo;
 
-
-  document
-    .getElementById("reserve")
-    .textContent =
-      player.reserve;
-
-
-  document
-    .getElementById("weaponName")
-    .textContent =
-      player.shotgun
-      ? "💥 SHOTGUN"
-      : "🔫 RIFLE";
-
-
-  document
-    .getElementById("remaining")
-    .textContent =
-      enemies.length+1;
-
-
-  document
-    .getElementById("stormTimer")
-    .textContent =
-      Math.ceil(storm.timer);
+  document.getElementById(
+    "reserve"
+  ).textContent=reserve;
 
 }
 
 
-/* ============================================================
-   3D PROJECTION
-============================================================ */
+/* =====================================================
+   ストーム
+===================================================== */
 
-function project(
-  x,
-  y,
-  z
-){
+setInterval(
+  ()=>{
 
-  const dx =
-    x-player.x;
+    if(!running)return;
 
-  const dy =
-    y-player.y;
+    storm--;
 
-
-  const sin =
-    Math.sin(-player.yaw);
-
-  const cos =
-    Math.cos(-player.yaw);
-
-
-  const cx =
-    dx*cos-dy*sin;
-
-  const cy =
-    dx*sin+dy*cos;
-
-
-  if(cy < .5)
-    return null;
-
-
-  const fov =
-    550 /
-    Math.tan(
-      Math.PI/4
-    );
-
-
-  const sx =
-    window.innerWidth/2 +
-    cx*fov/cy;
-
-
-  const sy =
-    window.innerHeight/2 -
-    (
-      z-player.z
-    )*fov/cy;
-
-
-  return {
-
-    x:sx,
-
-    y:sy,
-
-    scale:fov/cy,
-
-    depth:cy
-
-  };
-
-}
-
-
-/* ============================================================
-   DRAW WORLD
-============================================================ */
-
-function drawWorld(){
-
-  const w =
-    window.innerWidth;
-
-  const h =
-    window.innerHeight;
-
-
-  /* sky */
-
-  const sky =
-    ctx.createLinearGradient(
-      0,
-      0,
-      0,
-      h
-    );
-
-  sky.addColorStop(
-    0,
-    "#4db7ed"
-  );
-
-  sky.addColorStop(
-    .55,
-    "#a6e8ff"
-  );
-
-  sky.addColorStop(
-    .56,
-    "#69bd47"
-  );
-
-  sky.addColorStop(
-    1,
-    "#2f852f"
-  );
-
-
-  ctx.fillStyle=sky;
-
-  ctx.fillRect(
-    0,
-    0,
-    w,
-    h
-  );
-
-
-  /* ground grid */
-
-  ctx.strokeStyle =
-    "#ffffff18";
-
-  ctx.lineWidth=1;
-
-
-  for(
-    let i=-100;
-    i<=100;
-    i+=5
-  ){
-
-    const a =
-      project(
-        i,
-        -100,
-        0
-      );
-
-    const b =
-      project(
-        i,
-        100,
-        0
-      );
-
-
-    if(a && b){
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        a.x,
-        a.y
-      );
-
-      ctx.lineTo(
-        b.x,
-        b.y
-      );
-
-      ctx.stroke();
-
-    }
-
-  }
-
-
-  for(
-    let i=-100;
-    i<=100;
-    i+=5
-  ){
-
-    const a =
-      project(
-        -100,
-        i,
-        0
-      );
-
-    const b =
-      project(
-        100,
-        i,
-        0
-      );
-
-
-    if(a && b){
-
-      ctx.beginPath();
-
-      ctx.moveTo(
-        a.x,
-        a.y
-      );
-
-      ctx.lineTo(
-        b.x,
-        b.y
-      );
-
-      ctx.stroke();
-
-    }
-
-  }
-
-
-  /* buildings */
-
-  const buildings = [
-
-    [-25,-20,10,8],
-
-    [25,-30,12,10],
-
-    [-35,20,8,10],
-
-    [35,25,10,8],
-
-    [0,-45,15,10],
-
-    [0,40,14,9]
-
-  ];
-
-
-  buildings.forEach(
-    b => {
-
-      drawBuilding(
-        b[0],
-        b[1],
-        b[2],
-        b[3]
-      );
-
-    }
-  );
-
-
-  /* trees */
-
-  for(let i=0;i<35;i++){
-
-    const x =
-      Math.sin(i*17.7)*48;
-
-    const y =
-      Math.cos(i*8.3)*48;
-
-    drawTree(
-      x,
-      y
-    );
-
-  }
-
-
-  /* items */
-
-  items.forEach(
-    item => {
-
-      const p =
-        project(
-          item.x,
-          item.y,
-          1.2
-        );
-
-      if(!p) return;
-
-      ctx.fillStyle =
-        item.type==="ammo"
-        ? "#ffd52c"
-        : "#ff3e65";
-
-      ctx.beginPath();
-
-      ctx.arc(
-        p.x,
-        p.y,
-        Math.max(
-          3,
-          10*p.scale
-        ),
-        0,
-        Math.PI*2
-      );
-
-      ctx.fill();
-
-    }
-  );
-
-
-  /* builds */
-
-  builds.forEach(
-    b => drawBuild(b)
-  );
-
-
-  /* enemies */
-
-  enemies.forEach(
-    enemy => {
-
-      drawCharacter(
-        enemy.x,
-        enemy.y,
-        enemy.color
-      );
-
-    }
-  );
-
-
-  /* particles */
-
-  particles.forEach(
-    p => {
-
-      const q =
-        project(
-          p.x,
-          p.y,
-          2
-        );
-
-      if(!q) return;
-
-      ctx.globalAlpha =
-        Math.max(
-          0,
-          p.life/1000
-        );
-
-      ctx.fillStyle=p.color;
-
-      ctx.beginPath();
-
-      ctx.arc(
-        q.x,
-        q.y,
-        4,
-        0,
-        Math.PI*2
-      );
-
-      ctx.fill();
-
-      ctx.globalAlpha=1;
-
-    }
-  );
-
-
-  /* player */
-
-  drawPlayer();
-
-
-  /* storm */
-
-  drawStorm();
-
-}
-
-
-/* ============================================================
-   BUILDING
-============================================================ */
-
-function drawBuilding(
-  x,
-  y,
-  width,
-  depth
-){
-
-  const base =
-    project(
-      x,
-      y,
-      0
-    );
-
-  if(!base) return;
-
-
-  const top =
-    project(
-      x,
-      y,
-      12
-    );
-
-  if(!top) return;
-
-
-  const size =
-    Math.max(
-      20,
-      200*base.scale
-    );
-
-
-  ctx.fillStyle="#8c603f";
-
-  ctx.fillRect(
-    base.x-size/2,
-    top.y,
-    size,
-    base.y-top.y
-  );
-
-
-  ctx.fillStyle="#513526";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    top.x-size*.6,
-    top.y
-  );
-
-  ctx.lineTo(
-    top.x,
-    top.y-size*.35
-  );
-
-  ctx.lineTo(
-    top.x+size*.6,
-    top.y
-  );
-
-  ctx.closePath();
-
-  ctx.fill();
-
-
-  ctx.fillStyle="#161616";
-
-  ctx.fillRect(
-    base.x-size*.08,
-    base.y-size*.25,
-    size*.16,
-    size*.25
-  );
-
-}
-
-
-/* ============================================================
-   TREE
-============================================================ */
-
-function drawTree(
-  x,
-  y
-){
-
-  const p =
-    project(
-      x,
-      y,
-      0
-    );
-
-  if(!p) return;
-
-
-  const s =
-    Math.max(
-      5,
-      100*p.scale
-    );
-
-
-  ctx.fillStyle="#69452d";
-
-  ctx.fillRect(
-    p.x-s*.09,
-    p.y-s*.6,
-    s*.18,
-    s*.6
-  );
-
-
-  ctx.fillStyle="#16713d";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    p.x,
-    p.y-s*1.9
-  );
-
-  ctx.lineTo(
-    p.x-s*.65,
-    p.y-s*.6
-  );
-
-  ctx.lineTo(
-    p.x+s*.65,
-    p.y-s*.6
-  );
-
-  ctx.closePath();
-
-  ctx.fill();
-
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    p.x,
-    p.y-s*1.45
-  );
-
-  ctx.lineTo(
-    p.x-s*.8,
-    p.y-s*.25
-  );
-
-  ctx.lineTo(
-    p.x+s*.8,
-    p.y-s*.25
-  );
-
-  ctx.closePath();
-
-  ctx.fill();
-
-}
-
-
-/* ============================================================
-   CHARACTER
-============================================================ */
-
-function drawCharacter(
-  x,
-  y,
-  color
-){
-
-  const p =
-    project(
-      x,
-      y,
-      0
-    );
-
-  if(!p) return;
-
-
-  const s =
-    Math.max(
-      4,
-      120*p.scale
-    );
-
-
-  ctx.fillStyle="#ffc18e";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    p.x,
-    p.y-s*1.55,
-    s*.25,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  ctx.fillStyle=color;
-
-  roundRect(
-    ctx,
-    p.x-s*.28,
-    p.y-s*1.35,
-    s*.56,
-    s*1.1,
-    s*.2
-  );
-
-  ctx.fill();
-
-}
-
-
-/* ============================================================
-   PLAYER
-============================================================ */
-
-function drawPlayer(){
-
-  const w =
-    window.innerWidth;
-
-  const h =
-    window.innerHeight;
-
-
-  const x =
-    w/2;
-
-  const y =
-    h/2+50;
-
-
-  ctx.fillStyle="#ffc18e";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    x,
-    y-130,
-    30,
-    0,
-    Math.PI*2
-  );
-
-  ctx.fill();
-
-
-  ctx.fillStyle="#2467e8";
-
-  roundRect(
-    ctx,
-    x-35,
-    y-105,
-    70,
-    120,
-    25
-  );
-
-  ctx.fill();
-
-
-  /* weapon */
-
-  ctx.fillStyle="#222";
-
-  ctx.fillRect(
-    x+35,
-    y-75,
-    90,
-    18
-  );
-
-}
-
-
-/* ============================================================
-   BUILD
-============================================================ */
-
-function drawBuild(b){
-
-  const p =
-    project(
-      b.x,
-      b.y,
-      0
-    );
-
-  if(!p) return;
-
-
-  const s =
-    Math.max(
-      5,
-      140*p.scale
-    );
-
-
-  ctx.fillStyle =
-    b.type==="wall"
-    ? "#d89c42"
-    : "#c98732";
-
-
-  if(b.type==="wall"){
-
-    ctx.fillRect(
-      p.x-s*.5,
-      p.y-s,
-      s,
-      s
-    );
-
-  }else{
-
-    ctx.save();
-
-    ctx.translate(
-      p.x,
-      p.y-s*.15
-    );
-
-    ctx.rotate(-.15);
-
-    ctx.fillRect(
-      -s*.65,
-      -s*.25,
-      s*1.3,
-      s*.35
-    );
-
-    ctx.restore();
-
-  }
-
-}
-
-
-/* ============================================================
-   STORM
-============================================================ */
-
-function drawStorm(){
-
-  const cx =
-    window.innerWidth/2;
-
-  const cy =
-    window.innerHeight/2+50;
-
-
-  const radius =
-    Math.min(
-      window.innerWidth,
-      window.innerHeight
-    ) *
-    (
-      .15+
-      storm.radius/100
-    );
-
-
-  ctx.strokeStyle="#8758ff";
-
-  ctx.lineWidth=7;
-
-  ctx.globalAlpha=.55;
-
-  ctx.beginPath();
-
-  ctx.arc(
-    cx,
-    cy,
-    radius,
-    0,
-    Math.PI*2
-  );
-
-  ctx.stroke();
-
-  ctx.globalAlpha=1;
-
-}
-
-
-/* ============================================================
-   ROUND RECT
-============================================================ */
-
-function roundRect(
-  c,
-  x,
-  y,
-  w,
-  h,
-  r
-){
-
-  c.beginPath();
-
-  c.roundRect(
-    x,
-    y,
-    w,
-    h,
-    r
-  );
-
-}
-
-
-/* ============================================================
-   GAME LOOP
-============================================================ */
-
-function gameLoop(time){
-
-  if(!gameRunning)
-    return;
-
-
-  updateGame(time);
-
-  drawWorld();
-
-
-  gameAnimation =
-    requestAnimationFrame(
-      gameLoop
-    );
-
-}
-
-
-/* ============================================================
-   RESULT
-============================================================ */
-
-function finishGame(victory){
-
-  if(!gameRunning)
-    return;
-
-
-  gameRunning=false;
-
-
-  const overlay =
     document.getElementById(
-      "resultOverlay"
-    );
+      "stormTime"
+    ).textContent=storm;
 
-  overlay.classList.remove(
-    "hidden"
-  );
+    if(storm<=0){
 
-
-  if(victory){
-
-    document
-      .getElementById("resultTitle")
-      .textContent =
-        "🏆 VICTORY ROYALE!";
-
-    document
-      .getElementById("resultText")
-      .textContent =
-        "最後まで生き残りました！";
-
-
-    const p =
-      getPlayer();
-
-    if(p){
-
-      p.wins++;
-
-      p.level++;
-
-      p.coins+=500;
-
-      saveDB();
+      storm=90;
 
     }
 
-  }else{
-
-    document
-      .getElementById("resultTitle")
-      .textContent =
-        "💀 GAME OVER";
-
-    document
-      .getElementById("resultText")
-      .textContent =
-        "今回はここまで！";
-
-  }
-
-}
+  },
+  1000
+);
 
 
-function backToLobby(){
+/* =====================================================
+   ゲーム開始
+===================================================== */
 
-  gameRunning=false;
+function startGame(){
 
-  cancelAnimationFrame(
-    gameAnimation
-  );
+  running=true;
 
   document
-    .getElementById("resultOverlay")
+    .getElementById("lobby")
     .classList.add("hidden");
 
-  showScreen("lobby");
+  document
+    .getElementById("hud")
+    .classList.remove("hidden");
+
+  closePanels();
+
+  hp=100;
+
+  ammo=30;
+
+  reserve=120;
+
+  storm=90;
+
+  remaining=10;
+
+  updateHP();
+
+  updateAmmo();
+
+  document.getElementById(
+    "remaining"
+  ).textContent=remaining;
+
+  player.position.set(
+    0,
+    0,
+    12
+  );
 
 }
 
 
-/* ============================================================
-   INITIAL
-============================================================ */
+/* =====================================================
+   ロビーへ
+===================================================== */
 
-document.addEventListener(
-  "visibilitychange",
-  () => {
+function returnLobby(){
 
-    if(document.hidden){
+  running=false;
 
-      mouseDown=false;
+  if(document.pointerLockElement){
+    document.exitPointerLock();
+  }
 
-    }
+  document
+    .getElementById("hud")
+    .classList.add("hidden");
+
+  document
+    .getElementById("lobby")
+    .classList.remove("hidden");
+
+  closePanels();
+
+}
+
+
+/* =====================================================
+   ロビー
+===================================================== */
+
+function showLobby(){
+
+  closePanels();
+
+}
+
+
+/* =====================================================
+   パネル
+===================================================== */
+
+function closePanels(){
+
+  document
+    .querySelectorAll(".panel")
+    .forEach(
+      p=>p.classList.add("hidden")
+    );
+
+}
+
+function openShop(){
+
+  closePanels();
+
+  document
+    .getElementById("shopPanel")
+    .classList.remove("hidden");
+
+}
+
+function openLocker(){
+
+  closePanels();
+
+  document
+    .getElementById("lockerPanel")
+    .classList.remove("hidden");
+
+}
+
+function openNews(){
+
+  closePanels();
+
+  document
+    .getElementById("newsPanel")
+    .classList.remove("hidden");
+
+}
+
+function openAdmin(){
+
+  closePanels();
+
+  document
+    .getElementById("loginPanel")
+    .classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+   管理ログイン
+===================================================== */
+
+function adminLogin(){
+
+  const user=
+    document.getElementById(
+      "adminUser"
+    ).value;
+
+  const pass=
+    document.getElementById(
+      "adminPass"
+    ).value;
+
+  /*
+    デモ用ログイン
+
+    ユーザー名:
+    admin
+
+    パスワード:
+    1234
+  */
+
+  if(
+    user==="admin" &&
+    pass==="1234"
+  ){
+
+    closePanels();
+
+    document
+      .getElementById(
+        "adminPanel"
+      )
+      .classList.remove("hidden");
+
+  }else{
+
+    alert(
+      "ログイン情報が違います。\n\n"+
+      "デモ:\n"+
+      "admin / 1234"
+    );
 
   }
-);
+
+}
+
+
+/* =====================================================
+   ショップ
+===================================================== */
+
+function buy(item){
+
+  alert(
+    item+
+    " を購入しました！"
+  );
+
+}
+
+
+/* =====================================================
+   スキン
+===================================================== */
+
+function selectSkin(skin){
+
+  if(!playerBody)return;
+
+  if(skin==="BLUE HERO"){
+
+    playerBody.material.color
+      .set(0x2563eb);
+
+  }
+
+  if(skin==="RED HERO"){
+
+    playerBody.material.color
+      .set(0xef4444);
+
+  }
+
+  if(skin==="GREEN HERO"){
+
+    playerBody.material.color
+      .set(0x22c55e);
+
+  }
+
+  alert(
+    skin+
+    " を装備しました！"
+  );
+
+}
+
+
+/* =====================================================
+   ニュース投稿
+===================================================== */
+
+function postNews(){
+
+  const title=
+    prompt(
+      "ニュースタイトルを入力"
+    );
+
+  if(!title)return;
+
+  alert(
+    "ニュースを投稿しました:\n"+
+    title
+  );
+
+}
+
+
+/* =====================================================
+   ログアウト
+===================================================== */
+
+function logout(){
+
+  if(
+    confirm(
+      "ログアウトしますか？"
+    )
+  ){
+
+    alert(
+      "ログアウトしました。"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   結果画面
+===================================================== */
+
+function showResult(){
+
+  running=false;
+
+  document
+    .getElementById("hud")
+    .classList.add("hidden");
+
+  document
+    .getElementById("lobby")
+    .classList.add("hidden");
+
+  document
+    .getElementById("resultPanel")
+    .classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+   アニメーション
+===================================================== */
+
+function animate(){
+
+  requestAnimationFrame(
+    animate
+  );
+
+  const dt=
+    Math.min(
+      clock.getDelta(),
+      .05
+    );
+
+  updatePlayer(dt);
+
+  updateCamera();
+
+  updateBullets(dt);
+
+  /* アイテム回転 */
+
+  items.forEach(
+    item=>{
+      item.rotation.y+=dt*2;
+      item.position.y=
+        .8+
+        Math.sin(
+          performance.now()*.003
+        )*.15;
+    }
+  );
+
+  renderer.render(
+    scene,
+    camera
+  );
+
+}
+
+
+/* =====================================================
+   リサイズ
+===================================================== */
+
+function resize(){
+
+  camera.aspect=
+    innerWidth/innerHeight;
+
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(
+    innerWidth,
+    innerHeight
+  );
+
+}
+
+
+/* =====================================================
+   起動
+===================================================== */
+
+init3D();
 
 </script>
 
