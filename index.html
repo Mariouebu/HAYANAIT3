@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HAYANAIT3 3D Mini - Friends & Brainrot Edition</title>
+    <title>FORTNITE 3D Mini - Friends & Brainrot Edition</title>
     <!-- Tailwind CSS for UI styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -300,6 +300,17 @@
                             <p class="text-[10px] text-gray-400 mt-1">専用アリーナで1対1！武器を集めて最後まで戦え！</p>
                         </button>
 
+                        <div id="duel-reference-card" class="mt-3 hidden rounded-2xl overflow-hidden border border-red-400/30 bg-black/30">
+                            <div class="grid grid-cols-1 md:grid-cols-2">
+                                <img src="assets/1v1-reference.jpg" alt="1V1 Arena reference" class="w-full h-32 md:h-36 object-cover">
+                                <div class="p-3 flex flex-col justify-center">
+                                    <div class="text-[10px] font-black text-red-300 uppercase tracking-widest">1V1 ARENA</div>
+                                    <div class="font-black text-white mt-1">ステージ型デュエルアリーナ</div>
+                                    <p class="text-[10px] text-gray-400 mt-1">中央の武器ウォール、左右の段差、海上ステージ風の雰囲気で1対1。</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Brainrot Mode Box -->
                         <button id="mode-selector-brainrot" onclick="selectGameMode('brainrot')" class="group p-3 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-white/10 text-left hover:scale-[1.02] transition shadow-md">
                             <div class="flex justify-between items-center">
@@ -328,7 +339,7 @@
                 </div>
 
                 <!-- LOBBY QUICK SERVICES -->
-                <div class="w-full grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+                <div class="w-full grid grid-cols-1 md:grid-cols-4 gap-3 mt-2">
                     <button onclick="openNews()" class="bg-cyan-950/70 hover:bg-cyan-900/80 border border-cyan-400/30 rounded-2xl p-3 text-left transition hover:scale-[1.02]">
                         <div class="flex items-center gap-2"><i class="fa-solid fa-newspaper text-cyan-300"></i><b>最新ニュース</b></div>
                         <p id="lobby-news-summary" class="text-[10px] text-gray-400 mt-1">最新のお知らせを確認</p>
@@ -340,6 +351,10 @@
                     <button onclick="openCoinPurchase()" class="bg-yellow-950/70 hover:bg-yellow-900/80 border border-yellow-400/30 rounded-2xl p-3 text-left transition hover:scale-[1.02]">
                         <div class="flex items-center gap-2"><i class="fa-solid fa-coins text-yellow-300"></i><b>コインを購入</b></div>
                         <p class="text-[10px] text-gray-400 mt-1">決済方法を選択してコインを追加</p>
+                    </button>
+                    <button onclick="toggleLobbyMusic()" class="bg-pink-950/70 hover:bg-pink-900/80 border border-pink-400/30 rounded-2xl p-3 text-left transition hover:scale-[1.02]">
+                        <div class="flex items-center gap-2"><i class="fa-solid fa-music text-pink-300"></i><b>音楽</b></div>
+                        <p id="lobby-music-status" class="text-[10px] text-gray-400 mt-1">♪ ライラックを再生</p>
                     </button>
                 </div>
 
@@ -538,6 +553,9 @@
             <p class="text-[10px] text-gray-500 text-center mt-3">※実際のクレジットカード番号やPayPay認証情報は入力しません。このページだけで実決済は発生しません。</p>
         </div>
     </div>
+
+    <!-- Lobby music (user-provided audio) -->
+    <audio id="lobby-music" src="assets/lilac.mp3" preload="auto" loop></audio>
 
     <!-- Pointer Lock Prompt Overlay -->
     <div id="pointerlock-screen" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-40 hidden flex-col justify-center items-center text-white">
@@ -941,7 +959,8 @@
             { id:'emote_dance', name:'ビクトリーダンス', category:'エモート', icon:'💃', cost:500, desc:'戦場で踊ろう。' },
             { id:'emote_wave', name:'ウェーブ', category:'エモート', icon:'👋', cost:300, desc:'仲間に手を振る。' },
             { id:'music_battle', name:'Battle Beat', category:'音楽', icon:'🎵', cost:700, desc:'ロビーで流せるバトルBGM。' },
-            { id:'music_skyline', name:'Skyline', category:'音楽', icon:'🎶', cost:900, desc:'シーズンテーマBGM。' }
+            { id:'music_skyline', name:'Skyline', category:'音楽', icon:'🎶', cost:900, desc:'シーズンテーマBGM。' },
+            { id:'music_lilac', name:'ライラック', category:'音楽', icon:'🎼', cost:0, desc:'ロビーで流せる音楽。再生ボタンから試聴できます。' }
         ];
 
         let newsData = [
@@ -1104,6 +1123,8 @@
 
         function selectGameMode(mode) {
             selectedGameMode = mode;
+            const duelReference = document.getElementById('duel-reference-card');
+            if (duelReference) duelReference.classList.toggle('hidden', mode !== '1v1');
             document.querySelectorAll('#mode-selector-br, #mode-selector-reload, #mode-selector-1v1, #mode-selector-brainrot').forEach(box => {
                 box.className = "group p-3 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-white/10 text-left hover:scale-[1.02] transition shadow-md";
             });
@@ -1318,6 +1339,42 @@
             showToast(`✅ ${selectedCoinPack.coins.toLocaleString()} COINSを追加しました（${selectedPaymentMethod}・デモ決済）`);
         }
 
+        let lobbyMusicPlaying = false;
+        function toggleLobbyMusic() {
+            const audio = document.getElementById('lobby-music');
+            const status = document.getElementById('lobby-music-status');
+            if (!audio) return;
+            if (audio.paused) {
+                audio.play().then(() => {
+                    lobbyMusicPlaying = true;
+                    if (status) status.textContent = '⏸ 再生中：ライラック';
+                    showToast('🎵 ライラックを再生中');
+                }).catch(() => {
+                    showToast('音楽を再生できませんでした。もう一度押してください。', true);
+                });
+            } else {
+                audio.pause();
+                lobbyMusicPlaying = false;
+                if (status) status.textContent = '♪ ライラックを再生';
+                showToast('⏸ 音楽を停止しました');
+            }
+        }
+        function stopLobbyMusic() {
+            const audio = document.getElementById('lobby-music');
+            if (audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            lobbyMusicPlaying = false;
+            const status = document.getElementById('lobby-music-status');
+            if (status) status.textContent = '♪ ライラックを再生';
+        }
+        function startLobbyMusicIfAllowed() {
+            const audio = document.getElementById('lobby-music');
+            if (!audio || !lobbyMusicPlaying) return;
+            audio.play().catch(() => {});
+        }
+
         function openShop() {
             document.getElementById('shop-modal').classList.remove('hidden');
             document.getElementById('shop-modal').classList.add('flex');
@@ -1341,7 +1398,7 @@
             shopCosmetics.forEach(item=>{
                 const owned=profile&&profile.unlockedCosmetics.includes(item.id);
                 const card=document.createElement('div'); card.className='bg-gradient-to-b from-cyan-950 to-slate-950 rounded-2xl border border-cyan-500/20 p-4 flex flex-col justify-between text-center';
-                card.innerHTML=`<span class="text-[9px] bg-cyan-600 text-white px-2 py-1 rounded-full">${item.category}</span><div class="text-6xl my-4">${item.icon}</div><h3 class="font-black text-lg text-white">${item.name}</h3><p class="text-xs text-gray-400 mb-3">${item.desc}</p>${owned?'<div class="w-full py-2 bg-emerald-600 rounded-xl text-xs font-black">所有済み</div>':`<button onclick="purchaseItem('cosmetic','${item.id}',${item.cost})" class="w-full py-2 bg-yellow-400 text-black font-black rounded-xl text-xs">🪙 ${item.cost}</button>`}`;
+                card.innerHTML=`<span class="text-[9px] bg-cyan-600 text-white px-2 py-1 rounded-full">${item.category}</span><div class="text-6xl my-4">${item.icon}</div><h3 class="font-black text-lg text-white">${item.name}</h3><p class="text-xs text-gray-400 mb-3">${item.desc}</p>${item.id==='music_lilac'?`<div class="grid grid-cols-2 gap-2 w-full"><button onclick="toggleLobbyMusic()" class="py-2 bg-pink-500 text-white font-black rounded-xl text-xs">▶ 試聴</button><button onclick="purchaseItem('cosmetic','${item.id}',${item.cost})" class="py-2 bg-yellow-400 text-black font-black rounded-xl text-xs">🪙 無料</button></div>`:(owned?'<div class="w-full py-2 bg-emerald-600 rounded-xl text-xs font-black">所有済み</div>':`<button onclick="purchaseItem('cosmetic','${item.id}',${item.cost})" class="w-full py-2 bg-yellow-400 text-black font-black rounded-xl text-xs">🪙 ${item.cost}</button>`)}`;
                 grid.appendChild(card);
             });
         }
@@ -1508,6 +1565,7 @@
         let lastTimeFired = 0;
 
         function startGame() {
+            stopLobbyMusic();
             document.getElementById('lobby-screen').classList.add('hidden');
             const hud = document.getElementById('game-hud');
             if (hud) hud.classList.remove('hidden');
@@ -1602,6 +1660,21 @@
             createPlayerAvatar();
             spawnSquadsAndBots();
 
+            if (selectedGameMode === '1v1') {
+                // 1V1は左右のスポーン台に配置
+                if (player.mesh) {
+                    player.mesh.position.set(-20, 1.0, 0);
+                    player.mesh.rotation.y = Math.PI / 2;
+                    player.rotY = Math.PI / 2;
+                }
+                const enemy = bots.find(b => b.teamId !== 1);
+                if (enemy && enemy.mesh) {
+                    enemy.mesh.position.set(20, BOT_GROUND_Y, 0);
+                    enemy.mesh.rotation.y = -Math.PI / 2;
+                    enemy.x = 20; enemy.z = 0;
+                }
+            }
+
             selectInventorySlot(0);
 
             if (isMobile) {
@@ -1633,7 +1706,7 @@
 
         function spawnSquadsAndBots() {
             bots = [];
-            const friendsInvited = availableFriends.filter(f => f.inParty);
+            const friendsInvited = selectedGameMode === '1v1' ? [] : availableFriends.filter(f => f.inParty);
             let teamCounter = 1;
 
             let requiredTeammates = 0;
@@ -1652,7 +1725,7 @@
                 spawnTeammateBot(`Bot_Teammate_${i + 1}`, "#10b981");
             }
 
-            let enemyCount = mapSettings.botCount;
+            let enemyCount = selectedGameMode === '1v1' ? 1 : mapSettings.botCount;
             let groupSize = 1;
             if (selectedTeamSize === 'duo') groupSize = 2;
             else if (selectedTeamSize === 'trio') groupSize = 3;
@@ -1758,39 +1831,126 @@
         }
 
         function generate1v1Arena() {
+            // 参考画像の「海上に浮かぶ1V1ステージ＋左右の段差＋中央武器ウォール」を
+            // Three.jsのプリミティブだけで再現した2D寄りのローポリ風アリーナ。
             const size = 76;
-            const floor = new THREE.Mesh(
-                new THREE.BoxGeometry(size, 0.5, size),
-                new THREE.MeshStandardMaterial({color:0x475569, roughness:.8, metalness:.05})
-            );
+            const floorMat = new THREE.MeshStandardMaterial({color:0x172554, roughness:.55, metalness:.25});
+            const trimMat = new THREE.MeshStandardMaterial({color:0x94a3b8, roughness:.45, metalness:.15});
+            const stepMat = new THREE.MeshStandardMaterial({color:0x64748b, roughness:.75});
+            const wallMat = new THREE.MeshStandardMaterial({color:0x0f172a, roughness:.7});
+
+            const floor = new THREE.Mesh(new THREE.BoxGeometry(size, 0.7, size), floorMat);
             floor.position.y = 0.15;
             floor.receiveShadow = true;
             scene.add(floor);
 
-            const wallMat = new THREE.MeshStandardMaterial({color:0x1e293b, roughness:.75});
-            const wallH = 4;
-            const wallT = 1.2;
-            [[0,-size/2, size, wallT],[0,size/2,size,wallT],[-size/2,0,wallT,size],[size/2,0,wallT,size]].forEach(([x,z,w,d])=>{
-                const wall = new THREE.Mesh(new THREE.BoxGeometry(w,wallH,d),wallMat);
-                wall.position.set(x,wallH/2,z);
+            // 海面風の外周
+            const water = new THREE.Mesh(
+                new THREE.PlaneGeometry(260,260),
+                new THREE.MeshStandardMaterial({color:0x38bdf8, transparent:true, opacity:.55, roughness:.25, metalness:.05})
+            );
+            water.rotation.x = -Math.PI/2;
+            water.position.y = -0.35;
+            scene.add(water);
+
+            // 外周の低い壁
+            [[0,-size/2,size,1.2],[0,size/2,size,1.2],[-size/2,0,1.2,size],[size/2,0,1.2,size]].forEach(([x,z,w,d])=>{
+                const wall = new THREE.Mesh(new THREE.BoxGeometry(w,3.2,d),wallMat);
+                wall.position.set(x,1.6,z);
                 wall.castShadow = true;
                 wall.receiveShadow = true;
                 scene.add(wall);
             });
 
-            // 中央の遮蔽物を置いて、1v1らしい撃ち合いができるようにします。
-            [-14,14].forEach(x=>{
-                const cover = new THREE.Mesh(new THREE.BoxGeometry(8,3,3),new THREE.MeshStandardMaterial({color:0x0f766e,roughness:.8}));
-                cover.position.set(x,1.5,0);
-                cover.castShadow=true;
-                scene.add(cover);
+            // 左右の観客席／段差
+            function addBleachers(side) {
+                const dir = side;
+                for(let i=0;i<7;i++){
+                    const width = 27 - i*2.2;
+                    const depth = 3.1;
+                    const h = 0.45 + i*0.62;
+                    const x = dir*(27 - i*3.05);
+                    const z = 0;
+                    const step = new THREE.Mesh(new THREE.BoxGeometry(width, h, depth), stepMat);
+                    step.position.set(x, h/2 + 0.45, z);
+                    step.castShadow = true;
+                    step.receiveShadow = true;
+                    scene.add(step);
+                }
+            }
+            addBleachers(-1);
+            addBleachers(1);
+
+            // 中央の1V1戦闘ゾーン
+            const duelPad = new THREE.Mesh(
+                new THREE.BoxGeometry(30,0.22,30),
+                new THREE.MeshStandardMaterial({color:0x0ea5e9, roughness:.5, metalness:.2})
+            );
+            duelPad.position.y = 0.62;
+            duelPad.receiveShadow = true;
+            scene.add(duelPad);
+
+            // スポーン台
+            [-1,1].forEach(side=>{
+                const pad = new THREE.Mesh(
+                    new THREE.CylinderGeometry(4.2,4.2,.35,32),
+                    new THREE.MeshStandardMaterial({color:side<0?0xef4444:0x3b82f6, emissive:side<0?0x220000:0x001a44, emissiveIntensity:.35})
+                );
+                pad.position.set(side*20,0.9,0);
+                scene.add(pad);
             });
-            [-10,10].forEach(z=>{
-                const cover = new THREE.Mesh(new THREE.BoxGeometry(3,2.5,7),new THREE.MeshStandardMaterial({color:0x7c3aed,roughness:.8}));
-                cover.position.set(0,1.25,z);
-                cover.castShadow=true;
-                scene.add(cover);
+
+            // 中央遮蔽物
+            [
+                [-9,1.7,0,10,3.4,2.4,0xf97316],
+                [9,1.7,0,10,3.4,2.4,0x8b5cf6],
+                [0,1.5,-9,2.5,3,8,0x14b8a6],
+                [0,1.5,9,2.5,3,8,0xe11d48]
+            ].forEach(([x,y,z,w,h,d,c])=>{
+                const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:c,roughness:.7}));
+                m.position.set(x,y,z);
+                m.castShadow=true; m.receiveShadow=true;
+                scene.add(m);
             });
+
+            // 中央の武器ウォール
+            const weaponWall = new THREE.Mesh(
+                new THREE.BoxGeometry(22,7,1.2),
+                new THREE.MeshStandardMaterial({color:0xe2e8f0,roughness:.6})
+            );
+            weaponWall.position.set(0,4,-27);
+            weaponWall.castShadow=true;
+            scene.add(weaponWall);
+
+            const weaponColors=[0x111827,0x38bdf8,0xa855f7,0xe11d48,0xfacc15,0x22c55e];
+            for(let i=0;i<10;i++){
+                const gun = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.8,.35,.35),
+                    new THREE.MeshStandardMaterial({color:weaponColors[i%weaponColors.length],roughness:.4,metalness:.35})
+                );
+                gun.position.set(-9+i*2,4+(i%2)*1.5,-27.7);
+                gun.rotation.z = (i%2?-.12:.12);
+                scene.add(gun);
+            }
+
+            // 「1V1」看板
+            const sign = new THREE.Mesh(
+                new THREE.BoxGeometry(12,2.5,.35),
+                new THREE.MeshStandardMaterial({color:0x0f172a,roughness:.5,metalness:.15})
+            );
+            sign.position.set(0,8,-28);
+            scene.add(sign);
+
+            // 明るいステージ照明
+            [-1,1].forEach(side=>{
+                const light = new THREE.PointLight(side<0?0xff3366:0x33aaff, 18, 45);
+                light.position.set(side*18,12,0);
+                scene.add(light);
+            });
+
+            // 1V1ではストームを実質停止
+            storm.currentRadius = 1000;
+            storm.targetRadius = 1000;
         }
 
         function generateTrees() {
@@ -2518,6 +2678,7 @@
             document.getElementById('game-hud').classList.add('hidden');
 
             enterLobby();
+            // ブラウザの自動再生制限があるため、ロビーでは音楽ボタンから再生できます。
         }
 
         function initMergeMode() {
@@ -3511,6 +3672,22 @@ function initUltimatePlayPolish(){
   buildUltimateQuickbar(); requestAnimationFrame(ultimateVisualTick);
 }
 window.addEventListener('load',initUltimatePlayPolish);
+</script>
+
+
+<script>
+(function(){
+  const _baseSelectGameMode = window.selectGameMode;
+  if (typeof _baseSelectGameMode === 'function') {
+    // Existing function already toggles the reference card; this listener keeps it correct on initial load.
+    const observer = new MutationObserver(() => {
+      const card = document.getElementById('duel-reference-card');
+      if(card) card.classList.toggle('hidden', window.selectedGameMode !== '1v1');
+    });
+    const lobby = document.getElementById('lobby-screen');
+    if(lobby) observer.observe(lobby,{subtree:true,attributes:true,attributeFilter:['class']});
+  }
+})();
 </script>
 
 </body>
